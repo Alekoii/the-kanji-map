@@ -17,6 +17,7 @@ interface Props {
   graphData: BothGraphData | null;
   showOutLinks: boolean;
   showParticles: boolean;
+  joyoOnly: boolean; // New prop for Jōyō kanji filter
   triggerFocus: number;
   bounds: RectReadOnly;
 }
@@ -28,17 +29,25 @@ const Graph2D: React.FC<Props> = ({
   graphData,
   showOutLinks,
   showParticles,
+  joyoOnly,
   triggerFocus,
   bounds,
 }) => {
   // group: el.g === 1 ? "joyo" : el.g === 2 ? "jinmeiyo" : "other",
-  const joyoList = kanjilist.filter((el) => el.g === 1).map((el) => el.k);
-  const jinmeiyoList = kanjilist.filter((el) => el.g === 2).map((el) => el.k);
+  // Memoize lists to prevent recreation on every render
+  const joyoList = React.useMemo(
+    () => kanjilist.filter((el) => el.g === 1).map((el) => el.k),
+    [],
+  );
+  const jinmeiyoList = React.useMemo(
+    () => kanjilist.filter((el) => el.g === 2).map((el) => el.k),
+    [],
+  );
 
   const { resolvedTheme } = useTheme();
 
-  const fgRef: React.MutableRefObject<ForceGraphMethods | undefined> =
-    React.useRef();
+  const fgRef: React.MutableRefObject<ForceGraphMethods | undefined> = React
+    .useRef();
 
   const router = useRouter();
 
@@ -48,12 +57,42 @@ const Graph2D: React.FC<Props> = ({
   });
 
   React.useEffect(() => {
-    setData(
-      showOutLinks
-        ? graphData?.withOutLinks
-        : (graphData?.noOutLinks as unknown as GraphData)
-    );
-  }, [graphData?.noOutLinks, graphData?.withOutLinks, showOutLinks]);
+    if (!graphData) return;
+
+    const baseData = showOutLinks
+      ? graphData.withOutLinks
+      : (graphData.noOutLinks as unknown as GraphData);
+
+    if (!baseData) return;
+
+    if (joyoOnly) {
+      // Filter to only show Jōyō kanji and the current kanji
+      const joyoNodes = baseData.nodes.filter((node: { id: string; }) =>
+        joyoList.includes(String(node.id)) || node.id === kanjiInfo.id
+      );
+
+      const joyoNodeIds = joyoNodes.map((node: { id: any; }) => String(node.id));
+
+      const joyoLinks = baseData.links.filter((link: { source: { id: any; }; target: { id: any; }; }) => {
+        const sourceId = typeof link.source === "object"
+          ? link.source.id
+          : link.source;
+        const targetId = typeof link.target === "object"
+          ? link.target.id
+          : link.target;
+
+        return joyoNodeIds.includes(String(sourceId)) &&
+          joyoNodeIds.includes(String(targetId));
+      });
+
+      setData({
+        nodes: joyoNodes,
+        links: joyoLinks,
+      });
+    } else {
+      setData(baseData);
+    }
+  }, [graphData, showOutLinks, joyoOnly, kanjiInfo.id, joyoList]);
 
   const handleClick = (node: NodeObject) => void router.push(`/${node.id}`);
 
@@ -73,7 +112,7 @@ const Graph2D: React.FC<Props> = ({
 
   const paintNode = (
     node: NodeObject,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
     // globalScale: number
   ) => {
     const label = String(node.id);
@@ -160,7 +199,7 @@ const Graph2D: React.FC<Props> = ({
         ctx.font = `${fontSize}px Sans-Serif`;
         const textWidth = ctx.measureText(label).width;
         const bckgDimensions = [textWidth, fontSize].map(
-          (n) => n + fontSize * 0.2
+          (n) => n + fontSize * 0.2,
         ); // some padding
         // const bckgDimensions = node.__bckgDimensions;
         const radius = (bckgDimensions[1] / 2) * 1.5;
@@ -174,8 +213,9 @@ const Graph2D: React.FC<Props> = ({
       }}
       onNodeHover={(node) => handleNodeHover(node)}
       linkColor={() =>
-        getComputedStyle(document?.body)?.getPropertyValue("--color-foreground")
-      }
+        getComputedStyle(document?.body)?.getPropertyValue(
+          "--color-foreground",
+        )}
       linkCanvasObject={(link: LinkObject, ctx: CanvasRenderingContext2D) => {
         if (
           typeof link.source === "object" &&
@@ -190,7 +230,7 @@ const Graph2D: React.FC<Props> = ({
 
           const linkText = sameOn(
             String(link.source.id),
-            String(link.target.id)
+            String(link.target.id),
           );
 
           ctx.beginPath();
@@ -215,8 +255,7 @@ const Graph2D: React.FC<Props> = ({
       }}
       linkDirectionalArrowLength={4}
       linkDirectionalArrowColor={() =>
-        resolvedTheme === "dark" ? "#ffffff" : "#000000"
-      }
+        resolvedTheme === "dark" ? "#ffffff" : "#000000"}
       linkDirectionalArrowRelPos={({ source, target }) => {
         if (
           typeof source === "object" &&
@@ -228,7 +267,7 @@ const Graph2D: React.FC<Props> = ({
         ) {
           const linkLength = Math.hypot(
             target.x - source.x,
-            target.y - source.y
+            target.y - source.y,
           );
 
           return (linkLength - 3) / linkLength;
@@ -240,8 +279,7 @@ const Graph2D: React.FC<Props> = ({
       linkDirectionalParticleSpeed={0.004}
       linkDirectionalParticleWidth={() => (showParticles ? 2 : 0)}
       linkDirectionalParticleColor={() =>
-        resolvedTheme === "dark" ? "#ffffff" : "#000000"
-      }
+        resolvedTheme === "dark" ? "#ffffff" : "#000000"}
     />
   );
 };

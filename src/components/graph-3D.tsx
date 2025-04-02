@@ -1,4 +1,4 @@
-"us client";
+"use client";
 import kanjilist from "@/../data/kanjilist.json";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ interface Props {
   bounds: RectReadOnly;
   autoRotate: boolean;
   showParticles: boolean;
+  joyoOnly: boolean; // New prop for Jōyō kanji filter
 }
 
 export const dynamic = "force-dynamic";
@@ -31,16 +32,24 @@ const Graph3D = ({
   bounds,
   autoRotate,
   showParticles,
+  joyoOnly,
 }: Props) => {
   if (!graphData || !kanjiInfo) return <></>;
 
-  const joyoList = kanjilist.filter((el) => el.g === 1).map((el) => el.k);
-  const jinmeiyoList = kanjilist.filter((el) => el.g === 2).map((el) => el.k);
+  // Memoize lists to prevent recreation on every render
+  const joyoList = React.useMemo(
+    () => kanjilist.filter((el) => el.g === 1).map((el) => el.k),
+    [],
+  );
+  const jinmeiyoList = React.useMemo(
+    () => kanjilist.filter((el) => el.g === 2).map((el) => el.k),
+    [],
+  );
 
   const { resolvedTheme } = useTheme();
 
-  const fg3DRef: React.MutableRefObject<ForceGraphMethods | undefined> =
-    React.useRef();
+  const fg3DRef: React.MutableRefObject<ForceGraphMethods | undefined> = React
+    .useRef();
 
   React.useEffect(() => {
     return () => {
@@ -59,10 +68,42 @@ const Graph3D = ({
   });
 
   React.useEffect(() => {
-    setData(showOutLinks ? graphData?.withOutLinks : graphData?.noOutLinks);
-  }, [graphData?.withOutLinks, graphData?.noOutLinks, showOutLinks]);
+    if (!graphData) return;
 
-  // const data = graphData?.withOutLinks;
+    const baseData = showOutLinks
+      ? graphData.withOutLinks
+      : graphData.noOutLinks;
+
+    if (!baseData) return;
+
+    if (joyoOnly) {
+      // Filter to only show Jōyō kanji and the current kanji
+      const joyoNodes: NodeObjectWithData[] = baseData.nodes.filter((node: NodeObjectWithData) =>
+        joyoList.includes(String(node.id)) || node.id === kanjiInfo.id
+      );
+
+      const joyoNodeIds = joyoNodes.map((node) => String(node.id));
+
+      const joyoLinks = baseData.links.filter((link: { source: { id: any; }; target: { id: any; }; }) => {
+        const sourceId = typeof link.source === "object"
+          ? link.source.id
+          : link.source;
+        const targetId = typeof link.target === "object"
+          ? link.target.id
+          : link.target;
+
+        return joyoNodeIds.includes(String(sourceId)) &&
+          joyoNodeIds.includes(String(targetId));
+      });
+
+      setData({
+        nodes: joyoNodes,
+        links: joyoLinks,
+      });
+    } else {
+      setData(baseData);
+    }
+  }, [graphData, showOutLinks, joyoOnly, kanjiInfo.id, joyoList]);
 
   const handleClick = (node: NodeObject) => {
     void router.push(`/${node?.id}`);
@@ -81,7 +122,7 @@ const Graph3D = ({
       //@ts-ignore
       controls.autoRotate = autoRotate;
     }
-  }, [autoRotate, fg3DRef?.current]);
+  }, [autoRotate]);
 
   // FOCUS  ON MAIN NODE AT START
   React.useEffect(() => {
@@ -105,7 +146,7 @@ const Graph3D = ({
               z: node.z * distRatio,
             }, // new position
             { x: node.x, y: node.y, z: node.z }, // lookAt ({ x, y, z })
-            1000 // ms transition duration
+            1000, // ms transition duration
           );
         }
       }
@@ -162,7 +203,7 @@ const Graph3D = ({
       node.__threeObj.children[1].material.color.setRGB(
         color.r * 0.8,
         color.g * 0.8,
-        color.b * 0.8
+        color.b * 0.8,
       );
     }
   };
@@ -215,7 +256,7 @@ const Graph3D = ({
           const linkLength = Math.hypot(
             target.x - source.x,
             target.y - source.y,
-            target.z - source.z
+            target.z - source.z,
           );
           return (linkLength - 8) / linkLength;
         } else {
@@ -263,7 +304,7 @@ const Graph3D = ({
             transparent: true,
             depthWrite: false,
             opacity: 0.8,
-          })
+          }),
         );
 
         // If it's a single character
@@ -284,10 +325,12 @@ const Graph3D = ({
       linkThreeObjectExtend={true}
       // @ts-ignore
       linkThreeObject={(link: LinkObject) => {
-        const source =
-          typeof link.source === "object" ? link.source.id : link.source;
-        const target =
-          typeof link.target === "object" ? link.target.id : link.target;
+        const source = typeof link.source === "object"
+          ? link.source.id
+          : link.source;
+        const target = typeof link.target === "object"
+          ? link.target.id
+          : link.target;
 
         const linkText = sameOn(String(source), String(target));
 

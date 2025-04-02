@@ -8,6 +8,7 @@ const graphPreferenceAtom = atomWithStorage("graphPreference", {
     rotate: true,
     outLinks: true,
     particles: true,
+    joyoOnly: false, // New filter for Jōyō kanji
   },
   version: 0,
 });
@@ -21,7 +22,7 @@ const styleAtom = atom(
       ...current,
       state: { ...current.state, style: newStyle },
     });
-  }
+  },
 );
 
 const rotateAtom = atom(
@@ -32,7 +33,7 @@ const rotateAtom = atom(
       ...current,
       state: { ...current.state, rotate: newRotate },
     });
-  }
+  },
 );
 
 const outLinksAtom = atom(
@@ -43,7 +44,7 @@ const outLinksAtom = atom(
       ...current,
       state: { ...current.state, outLinks: newOutLinks },
     });
-  }
+  },
 );
 
 const particlesAtom = atom(
@@ -54,13 +55,25 @@ const particlesAtom = atom(
       ...current,
       state: { ...current.state, particles: newParticles },
     });
-  }
+  },
+);
+
+const joyoOnlyAtom = atom(
+  (get) => get(graphPreferenceAtom).state.joyoOnly,
+  (get, set, newJoyoOnly: boolean) => {
+    const current = get(graphPreferenceAtom);
+    set(graphPreferenceAtom, {
+      ...current,
+      state: { ...current.state, joyoOnly: newJoyoOnly },
+    });
+  },
 );
 
 export {
   graphPreferenceAtom,
-  styleAtom,
-  rotateAtom,
+  joyoOnlyAtom,
   outLinksAtom,
   particlesAtom,
+  rotateAtom,
+  styleAtom,
 };

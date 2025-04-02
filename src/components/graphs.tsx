@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { usePathname } from "next/navigation";
 import { useAtom } from "jotai";
 import {
+  joyoOnlyAtom,
   outLinksAtom,
   particlesAtom,
   rotateAtom,
@@ -40,13 +41,13 @@ interface Props {
 export const Graphs: React.FC<Props> = ({ kanjiInfo, graphData }) => {
   const [measureRef, bounds] = useMeasure({
     polyfill: ResizeObserver,
-    // debounce: 50,
   });
 
   const [style, setStyle] = useAtom(styleAtom);
   const [rotate, setRotate] = useAtom(rotateAtom);
   const [outLinks, setOutLinks] = useAtom(outLinksAtom);
   const [particles, setParticles] = useAtom(particlesAtom);
+  const [joyoOnly, setJoyoOnly] = useAtom(joyoOnlyAtom);
 
   const handleRotateChange = (value: boolean) => {
     setRotate(value);
@@ -59,6 +60,9 @@ export const Graphs: React.FC<Props> = ({ kanjiInfo, graphData }) => {
   };
   const handleParticlesChange = (value: boolean) => {
     setParticles(value);
+  };
+  const handleJoyoOnlyChange = (value: boolean) => {
+    setJoyoOnly(value);
   };
 
   const [tabValue] = React.useState(0);
@@ -94,6 +98,7 @@ export const Graphs: React.FC<Props> = ({ kanjiInfo, graphData }) => {
             graphData={graphData}
             showOutLinks={outLinks}
             showParticles={particles}
+            joyoOnly={joyoOnly}
             autoRotate={rotate}
             triggerFocus={tabValue + random}
             bounds={bounds}
@@ -105,6 +110,7 @@ export const Graphs: React.FC<Props> = ({ kanjiInfo, graphData }) => {
             graphData={graphData}
             showOutLinks={outLinks}
             showParticles={particles}
+            joyoOnly={joyoOnly}
             triggerFocus={tabValue + random}
             bounds={bounds}
           />
@@ -163,6 +169,24 @@ export const Graphs: React.FC<Props> = ({ kanjiInfo, graphData }) => {
             </TooltipTrigger>
             <TooltipContent>
               <p>Show outgoing links</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        <div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Toggle
+                className={cn("size-10", joyoOnly ? "bg-accent" : "")}
+                variant="outline"
+                aria-label="Show only Jōyō kanji"
+                pressed={joyoOnly}
+                onPressedChange={handleJoyoOnlyChange}
+              >
+                <span className="text-sm font-bold">漢</span>
+              </Toggle>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Show only Jōyō kanji</p>
             </TooltipContent>
           </Tooltip>
         </div>
