@@ -4,7 +4,8 @@ import { RadicalPageContent } from "./inner";
 
 export const metadata: Metadata = {
     title: "Radicals",
-    description: "Browse kanji by radicals",
+    description:
+        "Browse kanji by radical components using correct composition data",
 };
 
 export default function RadicalPage() {

@@ -1,4 +1,4 @@
-import { InfoIcon, ListIcon } from "lucide-react";
+import { InfoIcon, ListIcon, PuzzleIcon } from "lucide-react";
 import Link from "next/link";
 import LogoSVG from "./logo";
 import { buttonVariants } from "./ui/button";
@@ -47,6 +47,24 @@ export const Header = ({
             <p>Kanji List</p>
           </TooltipContent>
         </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={route === "radicals" ? "/" : "/radicals"}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                route === "radicals" ? "bg-accent text-accent-foreground" : "",
+              )}
+            >
+              <PuzzleIcon className={cn("size-5")} />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Radicals</p>
+          </TooltipContent>
+        </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
@@ -63,6 +81,7 @@ export const Header = ({
             <p>About this website</p>
           </TooltipContent>
         </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <ThemeSwitcherButton />
