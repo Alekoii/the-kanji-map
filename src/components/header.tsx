@@ -1,4 +1,4 @@
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, ListIcon } from "lucide-react";
 import Link from "next/link";
 import LogoSVG from "./logo";
 import { buttonVariants } from "./ui/button";
@@ -21,7 +21,7 @@ export const Header = ({
     <div
       className={cn(
         "flex items-center justify-between h-12 border-b",
-        className
+        className,
       )}
     >
       <div className="flex items-center h-ful">
@@ -34,10 +34,26 @@ export const Header = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              href={route === "about" ? "/ " : "about"}
+              href={route === "list" ? "/" : "/list"}
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                route === "about" ? "bg-accent! text-accent-foreground!" : ""
+                route === "list" ? "bg-accent text-accent-foreground" : "",
+              )}
+            >
+              <ListIcon className={cn("size-5")} />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Kanji List</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={route === "about" ? "/" : "/about"}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                route === "about" ? "bg-accent text-accent-foreground" : "",
               )}
             >
               <InfoIcon className={cn("size-5")} />

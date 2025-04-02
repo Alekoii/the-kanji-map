@@ -2,20 +2,18 @@
 
 import { useMediaQuery } from "react-responsive";
 import { Kanji } from "@/components/kanji";
-import { MobileLayout } from "@/components/mobile-layout";
 import { Radical } from "@/components/radical";
 import { Examples } from "@/components/examples";
 import { Graphs } from "@/components/graphs";
 import { SearchInput } from "@/components/search-input";
 import { DrawInput } from "@/components/draw-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SearchIcon } from "lucide-react";
 import React from "react";
 
 interface KanjiPageContentProps {
-  kanjiInfo: KanjiInfo; // Replace 'any' with the actual type
-  graphData: BothGraphData; // Replace 'any' with the actual type
-  strokeAnimation: string; // Replace 'any' with the actual type
+  kanjiInfo: KanjiInfo; 
+  graphData: BothGraphData; 
+  strokeAnimation: string; 
 }
 
 export function KanjiPageContent({
@@ -30,68 +28,45 @@ export function KanjiPageContent({
     setIsMounted(true);
   }, []);
   if (!isMounted) {
-    // Render a placeholder or nothing on the server and initial client render
-    return null; // or a loading indicator if appropriate
+
+    return null; 
   }
 
   if (isMobile) {
     return (
-      <div className="w-full grow md:hidden overflow-hidden">
-        <MobileLayout
-          tabs={[
-            {
-              id: 0,
-              label: "漢字",
-              content: (
-                <div className="p-4">
-                  <Kanji
-                    kanjiInfo={kanjiInfo}
-                    graphData={graphData}
-                    strokeAnimation={strokeAnimation}
-                    screen="mobile"
-                  />
-                </div>
-              ),
-            },
-            {
-              id: 1,
-              label: "例",
-              content: (
-                <div className="p-4">
-                  <Radical kanjiInfo={kanjiInfo} />
-                </div>
-              ),
-            },
-            {
-              id: 2,
-              label: "部首",
-              content: (
-                <ScrollArea className="size-full">
-                  <Examples kanjiInfo={kanjiInfo} />
-                </ScrollArea>
-              ),
-            },
-            {
-              id: 3,
-              label: "図",
-              content: <Graphs kanjiInfo={kanjiInfo} graphData={graphData} />,
-            },
-            {
-              id: 4,
-              label: (
-                <SearchIcon className="w-4 h-4 inline-block -translate-y-0.5" />
-              ),
-              content: (
-                <div className="relative mt-8 p-4 flex flex-col items-center gap-12">
-                  <SearchInput searchPlaceholder="Search kanji..." />
-                  <DrawInput />
-                </div>
-              ),
-            },
-          ]}
-          initialActiveTab={0}
-        />
-      </div>
+      <ScrollArea className="w-full h-[calc(100vh-3rem)]">
+        <div className="w-full p-4 space-y-8 pb-24">
+          {/* Search */}
+          <div className="flex justify-center w-full mb-2">
+            <SearchInput searchPlaceholder="Search kanji..." />
+          </div>
+
+          {/* Kanji Information */}
+          <div className="border rounded-lg p-4">
+            <Kanji
+              kanjiInfo={kanjiInfo}
+              graphData={graphData}
+              strokeAnimation={strokeAnimation}
+              screen="mobile"
+            />
+          </div>
+
+          {/* Radical Information */}
+          <div className="border rounded-lg p-4">
+            <Radical kanjiInfo={kanjiInfo} />
+          </div>
+
+          {/* Examples */}
+          <div className="border rounded-lg p-4">
+            <Examples kanjiInfo={kanjiInfo} />
+          </div>
+
+          {/* Graph */}
+          <div className="border rounded-lg h-[60vh]">
+            <Graphs kanjiInfo={kanjiInfo} graphData={graphData} />
+          </div>
+        </div>
+      </ScrollArea>
     );
   } else {
     return (
