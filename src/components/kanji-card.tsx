@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { joyoList } from "@/../data/joyo";
 import { jinmeiyoList } from "@/../data/jinmeiyo";
 
@@ -7,9 +6,10 @@ interface KanjiCardProps {
   meaning?: string;
   kunyomi?: string;
   showDetails?: boolean;
+  onClick?: () => void;
 }
 
-export function KanjiCard({ kanji, meaning, kunyomi, showDetails = false }: KanjiCardProps) {
+export function KanjiCard({ kanji, meaning, kunyomi, showDetails = false, onClick }: KanjiCardProps) {
   const getKanjiType = () => {
     if (joyoList.includes(kanji)) return "Jōyō";
     if (jinmeiyoList.includes(kanji)) return "Jinmeiyō";
@@ -23,32 +23,33 @@ export function KanjiCard({ kanji, meaning, kunyomi, showDetails = false }: Kanj
   };
 
   return (
-    <Link href={`/${kanji}`}>
-      <div className="group relative border rounded-lg p-4 hover:shadow-lg hover:border-primary transition-all duration-200 bg-card h-full flex flex-col">
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
-            {kanji}
-          </span>
-          <span className={`text-xs px-2 py-1 rounded-full ${getKanjiTypeColor()}`}>
-            {getKanjiType()}
-          </span>
-        </div>
-
-        {showDetails && (meaning || kunyomi) && (
-          <div className="mt-auto space-y-1 text-sm text-muted-foreground">
-            {meaning && (
-              <p className="line-clamp-2 font-medium text-foreground">
-                {meaning}
-              </p>
-            )}
-            {kunyomi && (
-              <p className="line-clamp-1 text-xs">
-                訓: {kunyomi}
-              </p>
-            )}
-          </div>
-        )}
+    <div
+      onClick={onClick}
+      className="group relative border rounded-lg p-4 hover:shadow-lg hover:border-primary transition-all duration-200 bg-card h-full flex flex-col cursor-pointer"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
+          {kanji}
+        </span>
+        <span className={`text-xs px-2 py-1 rounded-full ${getKanjiTypeColor()}`}>
+          {getKanjiType()}
+        </span>
       </div>
-    </Link>
+
+      {showDetails && (meaning || kunyomi) && (
+        <div className="mt-auto space-y-1 text-sm text-muted-foreground">
+          {meaning && (
+            <p className="line-clamp-2 font-medium text-foreground">
+              {meaning}
+            </p>
+          )}
+          {kunyomi && (
+            <p className="line-clamp-1 text-xs">
+              訓: {kunyomi}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

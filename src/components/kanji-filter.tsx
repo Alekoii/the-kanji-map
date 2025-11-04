@@ -10,6 +10,7 @@ import { X } from "lucide-react";
 
 export interface KanjiFilters {
   search: string;
+  searchType: "all" | "kanji" | "meaning" | "reading";
   type: "all" | "joyo" | "jinmeiyo" | "other";
   jlptLevels: string[];
   strokeRange: { min: number; max: number };
@@ -38,6 +39,7 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
   const resetFilters = () => {
     onFiltersChange({
       search: "",
+      searchType: "all",
       type: "all",
       jlptLevels: [],
       strokeRange: { min: 1, max: 30 },
@@ -46,6 +48,7 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
   };
 
   const hasActiveFilters = filters.search !== "" ||
+                          filters.searchType !== "all" ||
                           filters.type !== "all" ||
                           filters.jlptLevels.length > 0 ||
                           filters.strokeRange.min !== 1 ||
@@ -80,6 +83,40 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
               value={filters.search}
               onChange={(e) => updateFilter("search", e.target.value)}
             />
+          </div>
+
+          {/* Search Type */}
+          <div className="space-y-3">
+            <Label>Search In</Label>
+            <RadioGroup
+              value={filters.searchType}
+              onValueChange={(value) => updateFilter("searchType", value as KanjiFilters["searchType"])}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="all" id="search-all" />
+                <Label htmlFor="search-all" className="font-normal cursor-pointer">
+                  All Fields
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="kanji" id="search-kanji" />
+                <Label htmlFor="search-kanji" className="font-normal cursor-pointer">
+                  Kanji Only
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="meaning" id="search-meaning" />
+                <Label htmlFor="search-meaning" className="font-normal cursor-pointer">
+                  Meaning Only
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="reading" id="search-reading" />
+                <Label htmlFor="search-reading" className="font-normal cursor-pointer">
+                  Reading Only
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Kanji Type */}
