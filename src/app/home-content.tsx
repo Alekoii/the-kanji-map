@@ -14,6 +14,8 @@ interface KanjiItem {
   r: string; // reading (kunyomi)
   m: string; // meaning
   g: number; // group (1=joyo, 2=jinmeiyo, 3=other)
+  j: string | null; // JLPT level (N5, N4, N3, N2, N1, or null)
+  s: number | null; // stroke count
 }
 
 interface HomeContentProps {
@@ -56,16 +58,34 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
         return false;
       }
 
+      // JLPT Level filter
+      if (filters.jlptLevels.length > 0) {
+        if (!item.j || !filters.jlptLevels.includes(item.j)) {
+          return false;
+        }
+      }
+
+      // Stroke count filter
+      if (item.s !== null && item.s !== undefined) {
+        if (item.s < filters.strokeRange.min || item.s > filters.strokeRange.max) {
+          return false;
+        }
+      }
+
       return true;
     });
 
     // Sorting
     if (filters.sortBy === "frequency") {
-      // Items with lower index are more frequent
-      result = [...result];
+      // Items are already sorted by frequency (searchlist.json is frequency-ordered)
+      // No additional sorting needed
     } else if (filters.sortBy === "strokes") {
-      // Note: stroke count data not readily available in searchlist
-      // Would need additional data source
+      // Sort by stroke count (ascending)
+      result = [...result].sort((a, b) => {
+        const aStrokes = a.s ?? Number.MAX_SAFE_INTEGER;
+        const bStrokes = b.s ?? Number.MAX_SAFE_INTEGER;
+        return aStrokes - bStrokes;
+      });
     }
 
     return result;
