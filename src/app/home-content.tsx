@@ -230,7 +230,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
     return (
       <>
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b">
+          <div className="p-4">
             <KanjiFilter
               filters={filters}
               onFiltersChange={setFilters}
@@ -315,7 +315,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="p-6 border-b">
+        <div className="p-6 pb-0">
           <KanjiFilter
             filters={filters}
             onFiltersChange={setFilters}
