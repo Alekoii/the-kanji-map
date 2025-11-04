@@ -1,5 +1,7 @@
 import { joyoList } from "@/../data/joyo";
 import { jinmeiyoList } from "@/../data/jinmeiyo";
+import { MaximizeIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface KanjiCardProps {
   kanji: string;
@@ -7,9 +9,19 @@ interface KanjiCardProps {
   kunyomi?: string;
   showDetails?: boolean;
   onClick?: () => void;
+  onExpandClick?: (e: React.MouseEvent) => void;
+  isSelected?: boolean;
 }
 
-export function KanjiCard({ kanji, meaning, kunyomi, showDetails = false, onClick }: KanjiCardProps) {
+export function KanjiCard({
+  kanji,
+  meaning,
+  kunyomi,
+  showDetails = false,
+  onClick,
+  onExpandClick,
+  isSelected = false
+}: KanjiCardProps) {
   const getKanjiType = () => {
     if (joyoList.includes(kanji)) return "Jōyō";
     if (jinmeiyoList.includes(kanji)) return "Jinmeiyō";
@@ -25,15 +37,31 @@ export function KanjiCard({ kanji, meaning, kunyomi, showDetails = false, onClic
   return (
     <div
       onClick={onClick}
-      className="group relative border rounded-lg p-4 hover:shadow-lg hover:border-primary transition-all duration-200 bg-card h-full flex flex-col cursor-pointer"
+      className={`group relative border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-card h-full flex flex-col cursor-pointer ${
+        isSelected
+          ? "border-primary bg-primary/5"
+          : "border-border hover:border-primary"
+      }`}
     >
       <div className="flex items-start justify-between mb-2">
         <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
           {kanji}
         </span>
-        <span className={`text-xs px-2 py-1 rounded-full ${getKanjiTypeColor()}`}>
-          {getKanjiType()}
-        </span>
+        <div className="flex flex-col gap-1 items-end">
+          <span className={`text-xs px-2 py-1 rounded-full ${getKanjiTypeColor()}`}>
+            {getKanjiType()}
+          </span>
+          {onExpandClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={onExpandClick}
+            >
+              <MaximizeIcon className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {showDetails && (meaning || kunyomi) && (
