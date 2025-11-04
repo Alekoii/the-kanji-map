@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { X, SlidersHorizontal } from "lucide-react";
 
 export interface KanjiFilters {
@@ -119,8 +119,8 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
           />
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
             <Button variant="outline" size="default" className="gap-2">
               <SlidersHorizontal className="h-4 w-4" />
               <span className="hidden sm:inline">Filters</span>
@@ -130,11 +130,11 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
                 </span>
               )}
             </Button>
-          </DialogTrigger>
+          </SheetTrigger>
 
-          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="flex items-center justify-between">
+          <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="flex items-center justify-between pr-8">
                 <span>Filter Kanji</span>
                 {hasActiveFilters && (
                   <Button variant="ghost" size="sm" onClick={resetFilters}>
@@ -142,11 +142,10 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
                     Reset All
                   </Button>
                 )}
-              </DialogTitle>
-            </DialogHeader>
+              </SheetTitle>
+            </SheetHeader>
 
-            <ScrollArea className="flex-1 pr-4">
-              <div className="space-y-6">
+            <div className="mt-6 space-y-6">
                 {/* Search Type */}
                 <div className="space-y-3">
                   <Label>Search In</Label>
@@ -292,9 +291,8 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
                   </RadioGroup>
                 </div>
               </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+          </SheetContent>
+        </Sheet>
 
         <span className="text-sm text-muted-foreground whitespace-nowrap">
           {filteredCount.toLocaleString()} / {totalCount.toLocaleString()}
