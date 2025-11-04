@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "The Kanji Map",
-    "short_name": "TheKanjiMap",
-    "description": "The Kanji Map is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
+    "name": "Kanji Learn",
+    "short_name": "KanjiLearn",
+    "description": "Kanji Learn is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
     "icons": [
         {
             "src": "/icon-192x192.png",

@@ -1,6 +1,6 @@
 import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon } from "lucide-react";
 import Link from "next/link";
-import LogoSVG from "./logo";
+import Image from "next/image";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcherButton } from "./theme-switcher";
@@ -26,8 +26,14 @@ export const Header = ({
     >
       <div className="flex items-center h-ful">
         <Link href={`/`} className="flex h-full items-center">
-          <LogoSVG className="h-full py-2 px-4 w-14 inline-block" />
-          <h1 className="text-lg font-extrabold text-nowrap">The Kanji Map</h1>
+          <Image
+            src="/logo.svg"
+            alt="Kanji Learn Logo"
+            width={56}
+            height={48}
+            className="h-full py-2 px-4 w-14 inline-block"
+          />
+          <h1 className="text-lg font-extrabold text-nowrap">Kanji Learn</h1>
         </Link>
       </div>
       <div className="flex px-4 gap-2">

@@ -19,7 +19,7 @@ const About = () => {
               About
             </h1>
             <p>
-              The Kanji Map is a Japanese language learning tool that shows
+              Kanji Learn is a Japanese language learning tool that shows
               kanji information and decomposition in graph form.
             </p>
             <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-4">
@@ -211,7 +211,7 @@ const About = () => {
               Copyright
             </h1>
             <p>
-              ©The Kanji Map 2017-{new Date().getFullYear()} by{" "}
+              ©Kanji Learn 2017-{new Date().getFullYear()} by{" "}
               <a
                 target="_blank"
                 href="https://drgaborkovacs.com/index_en.html"

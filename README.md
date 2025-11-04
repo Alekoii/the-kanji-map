@@ -1,8 +1,8 @@
-# The Kanji Map
+# Kanji Learn
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/60c6e34d-30e3-480f-8e53-8848ab7b678d/deploy-status)](https://app.netlify.com/sites/thekanjimap/deploys)
 
-The Kanji Map is a Japanese language learning tool that shows kanji information and decomposition in graph form.
+Kanji Learn is a Japanese language learning tool that shows kanji information and decomposition in graph form.
 
 ### Try it online at [thekanjimap.com](https://thekanjimap.netlify.app) 
 

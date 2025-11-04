@@ -1,8 +1,8 @@
-# The Kanji Map - Claude Code Configuration
+# Kanji Learn - Claude Code Configuration
 
 ## Project Overview
 
-The Kanji Map is a Japanese language learning tool that visualizes kanji information and decomposition in interactive 2D/3D graph form. It helps learners understand the relationships between kanji characters, their radicals, and components.
+Kanji Learn is a Japanese language learning tool that visualizes kanji information and decomposition in interactive 2D/3D graph form. It helps learners understand the relationships between kanji characters, their radicals, and components.
 
 **Live Site**: [thekanjimap.com](https://thekanjimap.netlify.app)
 

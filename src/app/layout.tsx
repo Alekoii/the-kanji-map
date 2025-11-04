@@ -6,13 +6,13 @@ import "../styles/globals.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: { default: "The Kanji Map", template: "%s | The Kanji Map" },
+  title: { default: "Kanji Learn", template: "%s | Kanji Learn" },
   description:
-    "The Kanji Map is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
+    "Kanji Learn is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
   openGraph: {
-    title: "The Kanji Map",
+    title: "Kanji Learn",
     description:
-      "The Kanji Map is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
+      "Kanji Learn is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
   },
   icons: {
     icon: "/favicon.ico",
