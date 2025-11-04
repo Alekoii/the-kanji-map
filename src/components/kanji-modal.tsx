@@ -9,7 +9,6 @@ import { Radical } from "@/components/radical";
 import { Examples } from "@/components/examples";
 import { Graphs } from "@/components/graphs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getGraphData, getKanjiDataLocal, getStrokeAnimation } from "@/lib";
 
 interface KanjiModalProps {
   kanji: string;
@@ -27,20 +26,27 @@ export function KanjiModal({ kanji, isOpen, onClose }: KanjiModalProps) {
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
-  // Load kanji data
+  // Load kanji data from API
   useEffect(() => {
     if (isOpen && kanji) {
       setIsLoading(true);
-      Promise.all([
-        getKanjiDataLocal(kanji),
-        getGraphData(kanji),
-        getStrokeAnimation(kanji),
-      ]).then(([info, graph, stroke]) => {
-        setKanjiInfo(info);
-        setGraphData(graph);
-        setStrokeAnimation(stroke);
-        setIsLoading(false);
-      });
+      fetch(`/api/kanji/${encodeURIComponent(kanji)}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch kanji data");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setKanjiInfo(data.kanjiInfo);
+          setGraphData(data.graphData);
+          setStrokeAnimation(data.strokeAnimation);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error loading kanji data:", error);
+          setIsLoading(false);
+        });
     }
   }, [kanji, isOpen]);
 
