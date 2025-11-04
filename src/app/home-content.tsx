@@ -26,6 +26,7 @@ interface HomeContentProps {
 export function HomeContent({ isMobile = false }: HomeContentProps) {
   const [filters, setFilters] = useState<KanjiFilters>({
     search: "",
+    searchType: "all",
     type: "all",
     jlptLevels: [],
     strokeRange: { min: 1, max: 30 },
@@ -57,11 +58,30 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
       // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        const matchesKanji = item.k.includes(filters.search);
-        const matchesMeaning = item.m.toLowerCase().includes(searchLower);
-        const matchesReading = item.r.toLowerCase().includes(searchLower);
-        if (!matchesKanji && !matchesMeaning && !matchesReading) {
-          return false;
+
+        if (filters.searchType === "kanji") {
+          // Search only kanji character
+          if (!item.k.includes(filters.search)) {
+            return false;
+          }
+        } else if (filters.searchType === "meaning") {
+          // Search only meaning
+          if (!item.m.toLowerCase().includes(searchLower)) {
+            return false;
+          }
+        } else if (filters.searchType === "reading") {
+          // Search only reading
+          if (!item.r.toLowerCase().includes(searchLower)) {
+            return false;
+          }
+        } else {
+          // Search all fields (default)
+          const matchesKanji = item.k.includes(filters.search);
+          const matchesMeaning = item.m.toLowerCase().includes(searchLower);
+          const matchesReading = item.r.toLowerCase().includes(searchLower);
+          if (!matchesKanji && !matchesMeaning && !matchesReading) {
+            return false;
+          }
         }
       }
 
