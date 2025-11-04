@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { KanjiCard } from "@/components/kanji-card";
 import { KanjiFilter, type KanjiFilters } from "@/components/kanji-filter";
+import { KanjiModal } from "@/components/kanji-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import searchlist from "@/../data/searchlist.json";
@@ -31,7 +32,20 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
     sortBy: "default",
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = isMobile ? 20 : 48;
+
+  const handleKanjiClick = (kanji: string) => {
+    setSelectedKanji(kanji);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // Reset selected kanji after animation completes
+    setTimeout(() => setSelectedKanji(null), 300);
+  };
 
   const kanjiData = searchlist as KanjiItem[];
 
@@ -174,96 +188,31 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="p-4">
-          <KanjiFilter
-            filters={filters}
-            onFiltersChange={setFilters}
-            totalCount={kanjiData.length}
-            filteredCount={filteredKanji.length}
-          />
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-3">
-            {currentKanji.map((item) => (
-              <KanjiCard
-                key={item.k}
-                kanji={item.k}
-                meaning={item.m}
-                kunyomi={item.r}
-                showDetails={true}
-              />
-            ))}
+      <>
+        <div className="flex flex-col h-full">
+          <div className="p-4">
+            <KanjiFilter
+              filters={filters}
+              onFiltersChange={setFilters}
+              totalCount={kanjiData.length}
+              filteredCount={filteredKanji.length}
+            />
           </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 p-4 flex-wrap">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              {renderPagination()}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-3">
+              {currentKanji.map((item) => (
+                <KanjiCard
+                  key={item.k}
+                  kanji={item.k}
+                  meaning={item.m}
+                  kunyomi={item.r}
+                  showDetails={true}
+                  onClick={() => handleKanjiClick(item.k)}
+                />
+              ))}
             </div>
-          )}
-        </ScrollArea>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex h-full">
-      <div className="w-64 flex-shrink-0">
-        <KanjiFilter
-          filters={filters}
-          onFiltersChange={setFilters}
-          totalCount={kanjiData.length}
-          filteredCount={filteredKanji.length}
-        />
-      </div>
-      <div className="flex-1 flex flex-col">
-        <ScrollArea className="flex-1">
-          <div className="p-6">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-2">Kanji Explorer</h1>
-              <p className="text-muted-foreground">
-                Showing {startIndex + 1}-{Math.min(endIndex, filteredKanji.length)} of{" "}
-                {filteredKanji.length} kanji
-              </p>
-            </div>
-
-            {currentKanji.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {currentKanji.map((item) => (
-                  <KanjiCard
-                    key={item.k}
-                    kanji={item.k}
-                    meaning={item.m}
-                    kunyomi={item.r}
-                    showDetails={true}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground">
-                  No kanji found matching your criteria
-                </p>
-              </div>
-            )}
-
             {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-8 flex-wrap">
+              <div className="flex justify-center gap-2 p-4 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
@@ -283,9 +232,94 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
                 </Button>
               </div>
             )}
-          </div>
-        </ScrollArea>
+          </ScrollArea>
+        </div>
+        {selectedKanji && (
+          <KanjiModal
+            kanji={selectedKanji}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex h-full">
+        <div className="w-64 flex-shrink-0">
+          <KanjiFilter
+            filters={filters}
+            onFiltersChange={setFilters}
+            totalCount={kanjiData.length}
+            filteredCount={filteredKanji.length}
+          />
+        </div>
+        <div className="flex-1 flex flex-col">
+          <ScrollArea className="flex-1">
+            <div className="p-6">
+              <div className="mb-6">
+                <h1 className="text-3xl font-bold mb-2">Kanji Explorer</h1>
+                <p className="text-muted-foreground">
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredKanji.length)} of{" "}
+                  {filteredKanji.length} kanji
+                </p>
+              </div>
+
+              {currentKanji.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {currentKanji.map((item) => (
+                    <KanjiCard
+                      key={item.k}
+                      kanji={item.k}
+                      meaning={item.m}
+                      kunyomi={item.r}
+                      showDetails={true}
+                      onClick={() => handleKanjiClick(item.k)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-lg text-muted-foreground">
+                    No kanji found matching your criteria
+                  </p>
+                </div>
+              )}
+
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-8 flex-wrap">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  {renderPagination()}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
       </div>
-    </div>
+      {selectedKanji && (
+        <KanjiModal
+          kanji={selectedKanji}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
+    </>
   );
 }
