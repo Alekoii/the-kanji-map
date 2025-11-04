@@ -1,14 +1,20 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useAtom } from "jotai";
+import { practiceKanjiAtom } from "@/lib/store";
 import { KanjiCard } from "@/components/kanji-card";
 import { KanjiFilter, type KanjiFilters } from "@/components/kanji-filter";
 import { KanjiModal } from "@/components/kanji-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import searchlist from "@/../data/searchlist.json";
 import { joyoList } from "@/../data/joyo";
 import { jinmeiyoList } from "@/../data/jinmeiyo";
+import { PlayIcon, Trash2Icon } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface KanjiItem {
   k: string; // kanji
@@ -35,11 +41,26 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [practiceKanji, setPracticeKanji] = useAtom(practiceKanjiAtom);
   const itemsPerPage = isMobile ? 20 : 48;
 
   const handleKanjiClick = (kanji: string) => {
     setSelectedKanji(kanji);
     setIsModalOpen(true);
+  };
+
+  const toggleKanjiSelection = (kanji: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setPracticeKanji((prev) => {
+      if (prev.includes(kanji)) {
+        return prev.filter((k) => k !== kanji);
+      }
+      return [...prev, kanji];
+    });
+  };
+
+  const clearAllSelections = () => {
+    setPracticeKanji([]);
   };
 
   const handleCloseModal = () => {
@@ -221,14 +242,29 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
               {currentKanji.map((item) => (
-                <KanjiCard
-                  key={item.k}
-                  kanji={item.k}
-                  meaning={item.m}
-                  kunyomi={item.r}
-                  showDetails={true}
-                  onClick={() => handleKanjiClick(item.k)}
-                />
+                <div key={item.k} className="relative">
+                  <div className="absolute top-2 left-2 z-10">
+                    <Checkbox
+                      checked={practiceKanji.includes(item.k)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setPracticeKanji((prev) => [...prev, item.k]);
+                        } else {
+                          setPracticeKanji((prev) => prev.filter((k) => k !== item.k));
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-background border-2"
+                    />
+                  </div>
+                  <KanjiCard
+                    kanji={item.k}
+                    meaning={item.m}
+                    kunyomi={item.r}
+                    showDetails={true}
+                    onClick={() => handleKanjiClick(item.k)}
+                  />
+                </div>
               ))}
             </div>
             {totalPages > 1 && (
@@ -261,6 +297,31 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
             onClose={handleCloseModal}
           />
         )}
+        {practiceKanji.length > 0 && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+            <div className="bg-primary text-primary-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4">
+              <span className="font-semibold">
+                {practiceKanji.length} kanji selected
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={clearAllSelections}
+                >
+                  <Trash2Icon className="h-4 w-4 mr-1" />
+                  Clear
+                </Button>
+                <Link href="/practice">
+                  <Button size="sm" variant="secondary">
+                    <PlayIcon className="h-4 w-4 mr-1" />
+                    Practice
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </>
     );
   }
@@ -290,14 +351,29 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
               {currentKanji.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                   {currentKanji.map((item) => (
-                    <KanjiCard
-                      key={item.k}
-                      kanji={item.k}
-                      meaning={item.m}
-                      kunyomi={item.r}
-                      showDetails={true}
-                      onClick={() => handleKanjiClick(item.k)}
-                    />
+                    <div key={item.k} className="relative">
+                      <div className="absolute top-2 left-2 z-10">
+                        <Checkbox
+                          checked={practiceKanji.includes(item.k)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setPracticeKanji((prev) => [...prev, item.k]);
+                            } else {
+                              setPracticeKanji((prev) => prev.filter((k) => k !== item.k));
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="bg-background border-2"
+                        />
+                      </div>
+                      <KanjiCard
+                        kanji={item.k}
+                        meaning={item.m}
+                        kunyomi={item.r}
+                        showDetails={true}
+                        onClick={() => handleKanjiClick(item.k)}
+                      />
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -339,6 +415,31 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
         />
+      )}
+      {practiceKanji.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-primary text-primary-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4">
+            <span className="font-semibold">
+              {practiceKanji.length} kanji selected
+            </span>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={clearAllSelections}
+              >
+                <Trash2Icon className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+              <Link href="/practice">
+                <Button size="sm" variant="secondary">
+                  <PlayIcon className="h-4 w-4 mr-1" />
+                  Practice
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

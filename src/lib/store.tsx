@@ -69,11 +69,15 @@ const joyoOnlyAtom = atom(
   },
 );
 
+// Practice kanji selection - stores array of kanji IDs to practice
+const practiceKanjiAtom = atomWithStorage<string[]>("practiceKanji", []);
+
 export {
   graphPreferenceAtom,
   joyoOnlyAtom,
   outLinksAtom,
   particlesAtom,
+  practiceKanjiAtom,
   rotateAtom,
   styleAtom,
 };
