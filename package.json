@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "turbo": "next dev --turbo",
+    "generate:associations": "node scripts/generate-associations-data.js",
+    "prebuild": "npm run generate:associations",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

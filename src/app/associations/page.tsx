@@ -1,7 +1,8 @@
-import { getAllKanjiGraphData } from "@/lib";
 import { Metadata } from "next";
 import { AssociationsContent } from "./inner";
 import { Header } from "@/components/header";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const metadata: Metadata = {
   title: "Kanji Associations - Interactive 3D Network Visualization",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AssociationsPage() {
-  const graphData = await getAllKanjiGraphData();
+  // Load pre-generated static graph data
+  const graphDataPath = join(process.cwd(), "public/data/associations-graph.json");
+  const graphData = JSON.parse(readFileSync(graphDataPath, "utf8"));
 
   if (!graphData) return <div>Loading...</div>;
 
