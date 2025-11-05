@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, SlidersHorizontal, BookOpen, GraduationCap, Paintbrush, ArrowUpDown } from "lucide-react";
 
@@ -29,6 +30,18 @@ interface KanjiFilterProps {
 
 export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCount }: KanjiFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const updateFilter = <K extends keyof KanjiFilters>(key: K, value: KanjiFilters[K]) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -104,6 +117,186 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
 
   const activeChips = getActiveFilterChips();
 
+  // Filter content component (reused in both Sheet and Drawer)
+  const FilterContent = () => (
+    <div className="space-y-8">
+      {/* JLPT Level - Most commonly used filter */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-base font-semibold">JLPT Level</Label>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Filter by Japanese Language Proficiency Test level
+        </p>
+        <div className="grid grid-cols-5 gap-2">
+          {["N5", "N4", "N3", "N2", "N1"].map((level) => (
+            <Button
+              key={level}
+              variant={filters.jlptLevels.includes(level) ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleJlptLevel(level)}
+              className="w-full"
+            >
+              {level}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t" />
+
+      {/* Kanji Type */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-base font-semibold">Kanji Type</Label>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Official categorization of kanji characters
+        </p>
+        <RadioGroup
+          value={filters.type}
+          onValueChange={(value) => updateFilter("type", value as KanjiFilters["type"])}
+          className="space-y-2"
+        >
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="all" id="all" />
+            <div className="flex-1">
+              <Label htmlFor="all" className="font-medium cursor-pointer">
+                All Kanji
+              </Label>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="joyo" id="joyo" />
+            <div className="flex-1">
+              <Label htmlFor="joyo" className="font-medium cursor-pointer">
+                Jōyō Kanji
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">常用漢字 - Regular use</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="jinmeiyo" id="jinmeiyo" />
+            <div className="flex-1">
+              <Label htmlFor="jinmeiyo" className="font-medium cursor-pointer">
+                Jinmeiyō Kanji
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">人名用漢字 - Name use</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="other" id="other" />
+            <div className="flex-1">
+              <Label htmlFor="other" className="font-medium cursor-pointer">
+                Other Kanji
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Less common characters</p>
+            </div>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div className="border-t" />
+
+      {/* Stroke Count Range */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Paintbrush className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-base font-semibold">Stroke Count</Label>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Number of strokes to write the character
+        </p>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <Label htmlFor="min-strokes" className="text-xs text-muted-foreground mb-1.5 block">
+                Minimum
+              </Label>
+              <Input
+                id="min-strokes"
+                type="number"
+                min="1"
+                max="30"
+                value={filters.strokeRange.min}
+                onChange={(e) => updateFilter("strokeRange", {
+                  ...filters.strokeRange,
+                  min: parseInt(e.target.value) || 1
+                })}
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="max-strokes" className="text-xs text-muted-foreground mb-1.5 block">
+                Maximum
+              </Label>
+              <Input
+                id="max-strokes"
+                type="number"
+                min="1"
+                max="30"
+                value={filters.strokeRange.max}
+                onChange={(e) => updateFilter("strokeRange", {
+                  ...filters.strokeRange,
+                  max: parseInt(e.target.value) || 30
+                })}
+              />
+            </div>
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            {filters.strokeRange.min} - {filters.strokeRange.max} strokes
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t" />
+
+      {/* Sort By */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+          <Label className="text-base font-semibold">Sort Order</Label>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Change how results are displayed
+        </p>
+        <RadioGroup
+          value={filters.sortBy}
+          onValueChange={(value) => updateFilter("sortBy", value as KanjiFilters["sortBy"])}
+          className="space-y-2"
+        >
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="default" id="sort-default" />
+            <div className="flex-1">
+              <Label htmlFor="sort-default" className="font-medium cursor-pointer">
+                Default Order
+              </Label>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="frequency" id="frequency" />
+            <div className="flex-1">
+              <Label htmlFor="frequency" className="font-medium cursor-pointer">
+                By Frequency
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Most common first</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
+            <RadioGroupItem value="strokes" id="strokes" />
+            <div className="flex-1">
+              <Label htmlFor="strokes" className="font-medium cursor-pointer">
+                By Stroke Count
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Simplest first</p>
+            </div>
+          </div>
+        </RadioGroup>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-3">
       {/* Main Search and Filter Bar */}
@@ -132,212 +325,71 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
           </Select>
         </div>
 
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="default" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
-              {hasActiveFilters && (
-                <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 text-xs flex items-center justify-center">
-                  {activeChips.length}
-                </span>
-              )}
-            </Button>
-          </SheetTrigger>
-
-          <SheetContent side="right" className="w-full sm:max-w-md flex flex-col p-0">
-            <SheetHeader className="px-6 py-4 border-b">
-              <SheetTitle className="flex items-center justify-between pr-8">
-                <span>Filters</span>
+        {isMobile ? (
+          <Drawer open={isOpen} onOpenChange={setIsOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="default" className="gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
                 {hasActiveFilters && (
-                  <Button variant="ghost" size="sm" onClick={resetFilters}>
-                    <X className="w-4 h-4 mr-1" />
-                    Clear All
-                  </Button>
+                  <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 text-xs flex items-center justify-center">
+                    {activeChips.length}
+                  </span>
                 )}
-              </SheetTitle>
-            </SheetHeader>
+              </Button>
+            </DrawerTrigger>
 
-            <ScrollArea className="flex-1 px-6 py-6">
-              <div className="space-y-8">
-                {/* JLPT Level - Most commonly used filter */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                    <Label className="text-base font-semibold">JLPT Level</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Filter by Japanese Language Proficiency Test level
-                  </p>
-                  <div className="grid grid-cols-5 gap-2">
-                    {["N5", "N4", "N3", "N2", "N1"].map((level) => (
-                      <Button
-                        key={level}
-                        variant={filters.jlptLevels.includes(level) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleJlptLevel(level)}
-                        className="w-full"
-                      >
-                        {level}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+            <DrawerContent className="max-h-[90vh]">
+              <DrawerHeader className="px-6 py-4 border-b">
+                <DrawerTitle className="flex items-center justify-between">
+                  <span>Filters</span>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={resetFilters}>
+                      <X className="w-4 h-4 mr-1" />
+                      Clear All
+                    </Button>
+                  )}
+                </DrawerTitle>
+              </DrawerHeader>
 
-                <div className="border-t" />
+              <ScrollArea className="flex-1 px-6 py-6 overflow-y-auto">
+                <FilterContent />
+              </ScrollArea>
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="default" className="gap-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+                {hasActiveFilters && (
+                  <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 text-xs flex items-center justify-center">
+                    {activeChips.length}
+                  </span>
+                )}
+              </Button>
+            </SheetTrigger>
 
-                {/* Kanji Type */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    <Label className="text-base font-semibold">Kanji Type</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Official categorization of kanji characters
-                  </p>
-                  <RadioGroup
-                    value={filters.type}
-                    onValueChange={(value) => updateFilter("type", value as KanjiFilters["type"])}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="all" id="all" />
-                      <div className="flex-1">
-                        <Label htmlFor="all" className="font-medium cursor-pointer">
-                          All Kanji
-                        </Label>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="joyo" id="joyo" />
-                      <div className="flex-1">
-                        <Label htmlFor="joyo" className="font-medium cursor-pointer">
-                          Jōyō Kanji
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">常用漢字 - Regular use</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="jinmeiyo" id="jinmeiyo" />
-                      <div className="flex-1">
-                        <Label htmlFor="jinmeiyo" className="font-medium cursor-pointer">
-                          Jinmeiyō Kanji
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">人名用漢字 - Name use</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="other" id="other" />
-                      <div className="flex-1">
-                        <Label htmlFor="other" className="font-medium cursor-pointer">
-                          Other Kanji
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Less common characters</p>
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </div>
+            <SheetContent side="right" className="w-full sm:max-w-md flex flex-col p-0">
+              <SheetHeader className="px-6 py-4 border-b">
+                <SheetTitle className="flex items-center justify-between pr-8">
+                  <span>Filters</span>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={resetFilters}>
+                      <X className="w-4 h-4 mr-1" />
+                      Clear All
+                    </Button>
+                  )}
+                </SheetTitle>
+              </SheetHeader>
 
-                <div className="border-t" />
-
-                {/* Stroke Count Range */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Paintbrush className="h-4 w-4 text-muted-foreground" />
-                    <Label className="text-base font-semibold">Stroke Count</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Number of strokes to write the character
-                  </p>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <Label htmlFor="min-strokes" className="text-xs text-muted-foreground mb-1.5 block">
-                          Minimum
-                        </Label>
-                        <Input
-                          id="min-strokes"
-                          type="number"
-                          min="1"
-                          max="30"
-                          value={filters.strokeRange.min}
-                          onChange={(e) => updateFilter("strokeRange", {
-                            ...filters.strokeRange,
-                            min: parseInt(e.target.value) || 1
-                          })}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Label htmlFor="max-strokes" className="text-xs text-muted-foreground mb-1.5 block">
-                          Maximum
-                        </Label>
-                        <Input
-                          id="max-strokes"
-                          type="number"
-                          min="1"
-                          max="30"
-                          value={filters.strokeRange.max}
-                          onChange={(e) => updateFilter("strokeRange", {
-                            ...filters.strokeRange,
-                            max: parseInt(e.target.value) || 30
-                          })}
-                        />
-                      </div>
-                    </div>
-                    <div className="text-center text-sm text-muted-foreground">
-                      {filters.strokeRange.min} - {filters.strokeRange.max} strokes
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t" />
-
-                {/* Sort By */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-                    <Label className="text-base font-semibold">Sort Order</Label>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Change how results are displayed
-                  </p>
-                  <RadioGroup
-                    value={filters.sortBy}
-                    onValueChange={(value) => updateFilter("sortBy", value as KanjiFilters["sortBy"])}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="default" id="sort-default" />
-                      <div className="flex-1">
-                        <Label htmlFor="sort-default" className="font-medium cursor-pointer">
-                          Default Order
-                        </Label>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="frequency" id="frequency" />
-                      <div className="flex-1">
-                        <Label htmlFor="frequency" className="font-medium cursor-pointer">
-                          By Frequency
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Most common first</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                      <RadioGroupItem value="strokes" id="strokes" />
-                      <div className="flex-1">
-                        <Label htmlFor="strokes" className="font-medium cursor-pointer">
-                          By Stroke Count
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Simplest first</p>
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
-            </ScrollArea>
-          </SheetContent>
-        </Sheet>
+              <ScrollArea className="flex-1 px-6 py-6">
+                <FilterContent />
+              </ScrollArea>
+            </SheetContent>
+          </Sheet>
+        )}
 
         <span className="text-sm text-muted-foreground whitespace-nowrap">
           {filteredCount.toLocaleString()} / {totalCount.toLocaleString()}
