@@ -37,24 +37,22 @@ type FullKanjiData = {
         hiragana: string;
       };
     };
+    examples?: Array<{
+      japanese: string;
+      meaning: {
+        english: string;
+      };
+      audio: {
+        mp3: string;
+        ogg?: string;
+        opus?: string;
+        aac?: string;
+      };
+    }>;
   };
   jishoData?: {
     onyomi?: string[];
     kunyomi?: string[];
-    onyomiExamples?: Array<{
-      example: string;
-      reading: string;
-      audio?: {
-        mp3?: string;
-      };
-    }>;
-    kunyomiExamples?: Array<{
-      example: string;
-      reading: string;
-      audio?: {
-        mp3?: string;
-      };
-    }>;
   };
 };
 
@@ -321,16 +319,16 @@ export function PracticeGameContent() {
                   {currentKanjiData.kanjialiveData?.kanji?.onyomi && (
                     <button
                       onClick={() => {
-                        const audioUrl = currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3;
+                        const audioUrl = currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3;
                         if (audioUrl) {
                           playAudio(audioUrl, 'onyomi');
                         }
                       }}
-                      disabled={!currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3}
+                      disabled={!currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3}
                       className={cn(
                         "flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all",
                         "hover:border-primary hover:bg-accent",
-                        currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3
+                        currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3
                           ? "cursor-pointer"
                           : "cursor-default opacity-60",
                         playingAudio === 'onyomi' && "border-primary bg-accent"
@@ -345,7 +343,7 @@ export function PracticeGameContent() {
                           {currentKanjiData.kanjialiveData.kanji.onyomi.romaji}
                         </div>
                       </div>
-                      {currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3 && (
+                      {currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3 && (
                         <Volume2 className={cn(
                           "h-5 w-5 text-muted-foreground",
                           playingAudio === 'onyomi' && "text-primary animate-pulse"
@@ -358,16 +356,17 @@ export function PracticeGameContent() {
                   {currentKanjiData.kanjialiveData?.kanji?.kunyomi && (
                     <button
                       onClick={() => {
-                        const audioUrl = currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3;
+                        const audioUrl = currentKanjiData.kanjialiveData?.examples?.[1]?.audio?.mp3 ||
+                                       currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3;
                         if (audioUrl) {
                           playAudio(audioUrl, 'kunyomi');
                         }
                       }}
-                      disabled={!currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3}
+                      disabled={!currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3}
                       className={cn(
                         "flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all",
                         "hover:border-primary hover:bg-accent",
-                        currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3
+                        currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3
                           ? "cursor-pointer"
                           : "cursor-default opacity-60",
                         playingAudio === 'kunyomi' && "border-primary bg-accent"
@@ -382,7 +381,7 @@ export function PracticeGameContent() {
                           {currentKanjiData.kanjialiveData.kanji.kunyomi.romaji}
                         </div>
                       </div>
-                      {currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3 && (
+                      {currentKanjiData.kanjialiveData?.examples?.[0]?.audio?.mp3 && (
                         <Volume2 className={cn(
                           "h-5 w-5 text-muted-foreground",
                           playingAudio === 'kunyomi' && "text-primary animate-pulse"
