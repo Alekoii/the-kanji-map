@@ -34,7 +34,6 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
     searchType: "all",
     type: "all",
     jlptLevels: [],
-    strokeRange: { min: 1, max: 30 },
     sortBy: "default",
   });
   const [currentPage, setCurrentPage] = useState(1);
@@ -143,13 +142,6 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
       // JLPT Level filter
       if (filters.jlptLevels.length > 0) {
         if (!item.j || !filters.jlptLevels.includes(item.j)) {
-          return false;
-        }
-      }
-
-      // Stroke count filter
-      if (item.s !== null && item.s !== undefined) {
-        if (item.s < filters.strokeRange.min || item.s > filters.strokeRange.max) {
           return false;
         }
       }

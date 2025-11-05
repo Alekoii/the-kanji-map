@@ -2,20 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, SlidersHorizontal } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 
 export interface KanjiFilters {
   search: string;
   searchType: "all" | "kanji" | "meaning" | "reading";
   type: "all" | "joyo" | "jinmeiyo" | "other";
   jlptLevels: string[];
-  strokeRange: { min: number; max: number };
   sortBy: "default" | "frequency" | "strokes";
 }
 
@@ -86,7 +83,6 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
       searchType: "all" as const,
       type: "all" as const,
       jlptLevels: [],
-      strokeRange: { min: 1, max: 30 },
       sortBy: "default" as const,
     };
     onFiltersChange(defaultFilters);
@@ -95,15 +91,12 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
 
   const hasActiveFilters = filters.type !== "all" ||
                           filters.jlptLevels.length > 0 ||
-                          filters.strokeRange.min !== 1 ||
-                          filters.strokeRange.max !== 30 ||
                           filters.sortBy !== "default";
 
   const FilterContent = () => (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Search */}
       <div className="space-y-2">
-        <Label htmlFor="search" className="text-sm font-semibold">Search</Label>
         <Input
           id="search"
           placeholder="Search kanji..."
@@ -127,127 +120,63 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
         </Select>
       </div>
 
-      <Separator />
-
       {/* JLPT Level */}
-      <div className="space-y-2">
-        <Label className="text-sm font-semibold">JLPT Level</Label>
-        <div className="grid grid-cols-5 gap-2">
-          {["N5", "N4", "N3", "N2", "N1"].map((level) => (
-            <Button
-              key={level}
-              variant={filters.jlptLevels.includes(level) ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleJlptLevel(level)}
-              className="h-9"
-            >
-              {level}
-            </Button>
-          ))}
-        </div>
+      <div className="grid grid-cols-5 gap-2">
+        {["N5", "N4", "N3", "N2", "N1"].map((level) => (
+          <Button
+            key={level}
+            variant={filters.jlptLevels.includes(level) ? "default" : "outline"}
+            size="sm"
+            onClick={() => toggleJlptLevel(level)}
+            className="h-9"
+          >
+            {level}
+          </Button>
+        ))}
       </div>
-
-      <Separator />
 
       {/* Kanji Type */}
-      <div className="space-y-2">
-        <Label htmlFor="type" className="text-sm font-semibold">Kanji Type</Label>
-        <Select
-          value={filters.type}
-          onValueChange={(value) => updateFilter("type", value as KanjiFilters["type"])}
-        >
-          <SelectTrigger id="type" className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Kanji</SelectItem>
-            <SelectItem value="joyo">Jōyō Kanji</SelectItem>
-            <SelectItem value="jinmeiyo">Jinmeiyō Kanji</SelectItem>
-            <SelectItem value="other">Other Kanji</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Separator />
-
-      {/* Stroke Count */}
-      <div className="space-y-2">
-        <Label className="text-sm font-semibold">Stroke Count</Label>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label htmlFor="min-strokes" className="text-xs text-muted-foreground">
-              Min
-            </Label>
-            <Input
-              id="min-strokes"
-              type="number"
-              min="1"
-              max="30"
-              value={filters.strokeRange.min}
-              onChange={(e) => updateFilter("strokeRange", {
-                ...filters.strokeRange,
-                min: parseInt(e.target.value) || 1
-              })}
-              className="h-9"
-            />
-          </div>
-          <div>
-            <Label htmlFor="max-strokes" className="text-xs text-muted-foreground">
-              Max
-            </Label>
-            <Input
-              id="max-strokes"
-              type="number"
-              min="1"
-              max="30"
-              value={filters.strokeRange.max}
-              onChange={(e) => updateFilter("strokeRange", {
-                ...filters.strokeRange,
-                max: parseInt(e.target.value) || 30
-              })}
-              className="h-9"
-            />
-          </div>
-        </div>
-        <p className="text-xs text-center text-muted-foreground">
-          {filters.strokeRange.min} - {filters.strokeRange.max} strokes
-        </p>
-      </div>
-
-      <Separator />
+      <Select
+        value={filters.type}
+        onValueChange={(value) => updateFilter("type", value as KanjiFilters["type"])}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Kanji</SelectItem>
+          <SelectItem value="joyo">Jōyō Kanji</SelectItem>
+          <SelectItem value="jinmeiyo">Jinmeiyō Kanji</SelectItem>
+          <SelectItem value="other">Other Kanji</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Sort By */}
-      <div className="space-y-2">
-        <Label htmlFor="sort" className="text-sm font-semibold">Sort Order</Label>
-        <Select
-          value={filters.sortBy}
-          onValueChange={(value) => updateFilter("sortBy", value as KanjiFilters["sortBy"])}
-        >
-          <SelectTrigger id="sort" className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="default">Default Order</SelectItem>
-            <SelectItem value="frequency">By Frequency</SelectItem>
-            <SelectItem value="strokes">By Stroke Count</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Separator />
+      <Select
+        value={filters.sortBy}
+        onValueChange={(value) => updateFilter("sortBy", value as KanjiFilters["sortBy"])}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="default">Default Order</SelectItem>
+          <SelectItem value="frequency">By Frequency</SelectItem>
+          <SelectItem value="strokes">By Stroke Count</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Stats and Reset */}
-      <div className="space-y-3">
-        <div className="text-sm">
+      <div className="space-y-2 pt-2">
+        <div className="text-xs text-center">
           <p className="text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredCount.toLocaleString()}</span> of{" "}
-            <span className="font-semibold text-foreground">{totalCount.toLocaleString()}</span> kanji
+            <span className="font-semibold text-foreground">{filteredCount.toLocaleString()}</span> / <span className="font-semibold text-foreground">{totalCount.toLocaleString()}</span>
           </p>
         </div>
         {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">
-            <X className="w-4 h-4 mr-2" />
-            Reset All Filters
+          <Button variant="outline" size="sm" onClick={resetFilters} className="w-full h-8">
+            <X className="w-3 h-3 mr-1.5" />
+            Reset
           </Button>
         )}
       </div>
@@ -268,7 +197,6 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
                   {[
                     filters.type !== "all",
                     filters.jlptLevels.length > 0,
-                    filters.strokeRange.min !== 1 || filters.strokeRange.max !== 30,
                     filters.sortBy !== "default"
                   ].filter(Boolean).length}
                 </span>
