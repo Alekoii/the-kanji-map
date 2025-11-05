@@ -124,8 +124,10 @@ export function PracticeGameContent() {
 
     const fetchKanjiData = async () => {
       try {
+        const url = `/data/kanji/${encodeURIComponent(currentQuestion.kanji)}.json`;
         console.log("Fetching kanji data for:", currentQuestion.kanji);
-        const response = await fetch(`/data/kanji/${currentQuestion.kanji}.json`);
+        console.log("Fetch URL:", url);
+        const response = await fetch(url);
         console.log("Fetch response status:", response.status);
         if (response.ok) {
           const data = await response.json();
@@ -134,7 +136,7 @@ export function PracticeGameContent() {
           console.log("Has kunyomi?", data.kanjialiveData?.kanji?.kunyomi);
           setCurrentKanjiData(data);
         } else {
-          console.error("Failed to fetch kanji data, status:", response.status);
+          console.error("Failed to fetch kanji data, status:", response.status, "URL:", url);
           setCurrentKanjiData(null);
         }
       } catch (error) {
