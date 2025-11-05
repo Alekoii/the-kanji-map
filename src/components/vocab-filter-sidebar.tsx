@@ -226,15 +226,12 @@ export function VocabFilterSidebar({ filters, onFiltersChange, totalCount, filte
   }
 
   return (
-    <aside className="w-80 border-r bg-muted/10">
-      <ScrollArea className="h-full">
-        <div className="p-6 space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold mb-1">Filters</h2>
-            <p className="text-sm text-muted-foreground">
-              Refine your vocabulary search
-            </p>
-          </div>
+    <aside className="w-64 border-r bg-card h-full overflow-hidden flex flex-col">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-semibold">Filters</h2>
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-4">
           <FilterContent />
         </div>
       </ScrollArea>
