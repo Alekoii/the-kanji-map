@@ -124,11 +124,17 @@ export function PracticeGameContent() {
 
     const fetchKanjiData = async () => {
       try {
+        console.log("Fetching kanji data for:", currentQuestion.kanji);
         const response = await fetch(`/data/kanji/${currentQuestion.kanji}.json`);
+        console.log("Fetch response status:", response.status);
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched kanji data:", data);
+          console.log("Has onyomi?", data.kanjialiveData?.kanji?.onyomi);
+          console.log("Has kunyomi?", data.kanjialiveData?.kanji?.kunyomi);
           setCurrentKanjiData(data);
         } else {
+          console.error("Failed to fetch kanji data, status:", response.status);
           setCurrentKanjiData(null);
         }
       } catch (error) {
