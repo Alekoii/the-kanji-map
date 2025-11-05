@@ -211,8 +211,8 @@ export function VocabPracticeGameContent() {
 
       {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="min-h-full flex items-center justify-center p-4 pb-24">
-          <div className="w-full max-w-2xl space-y-8">
+        <div className="p-4 pb-24 md:min-h-full md:flex md:items-center md:justify-center">
+          <div className="w-full max-w-2xl space-y-8 py-4">
             {/* Progress bar */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-muted-foreground">
