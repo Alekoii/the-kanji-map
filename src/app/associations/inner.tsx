@@ -60,7 +60,7 @@ export function AssociationsContent({ graphData }: Props) {
 
   return (
     <div ref={measureRef} className="relative h-[calc(100vh-4rem)] w-full">
-      {/* Title */}
+      {/* Title and Legend */}
       <div className="absolute top-4 left-4 z-50 bg-background/80 backdrop-blur-sm p-4 rounded-lg border">
         <h1 className="text-2xl font-bold mb-1">Kanji Associations Network</h1>
         <p className="text-sm text-muted-foreground">
@@ -69,6 +69,23 @@ export function AssociationsContent({ graphData }: Props) {
         <p className="text-xs text-muted-foreground mt-2">
           {graphData.nodes.length} kanji | {graphData.links.length} connections
         </p>
+
+        {/* Color Legend */}
+        <div className="mt-4 pt-3 border-t space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground mb-2">Legend</p>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3b82f6' }}></div>
+            <span className="text-xs">Jōyō Kanji (常用漢字)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10b981' }}></div>
+            <span className="text-xs">Jinmeiyō Kanji (人名用漢字)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f59e0b' }}></div>
+            <span className="text-xs">Other Kanji</span>
+          </div>
+        </div>
       </div>
 
       {/* Controls */}

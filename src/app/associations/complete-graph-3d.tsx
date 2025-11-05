@@ -178,11 +178,11 @@ const CompleteGraph3D = ({
 
   const getNodeDefaultColor = (nodeId: string) => {
     if (joyoList.includes(String(nodeId))) {
-      return "#80c2e2"; // Joyo kanji
+      return "#3b82f6"; // Joyo kanji - Blue (more vibrant)
     } else if (jinmeiyoList.includes(String(nodeId))) {
-      return "#d5ebf5"; // Jinmeiyo kanji
+      return "#10b981"; // Jinmeiyo kanji - Green (distinct)
     }
-    return "#fff"; // Other
+    return "#f59e0b"; // Other - Amber/Orange (clearly different)
   };
 
   // Find same onyomi between two kanji
@@ -241,7 +241,7 @@ const CompleteGraph3D = ({
             color: color,
             transparent: true,
             depthWrite: false,
-            opacity: 0.8,
+            opacity: 0.95,
           }),
         );
 
