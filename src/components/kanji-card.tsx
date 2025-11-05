@@ -37,7 +37,7 @@ export function KanjiCard({
   return (
     <div
       onClick={onClick}
-      className={`group relative border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-card h-full flex flex-col cursor-pointer ${
+      className={`group relative border rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-card h-full flex flex-col cursor-pointer ${
         isSelected
           ? "border-primary bg-primary/5"
           : "border-border hover:border-primary"
