@@ -95,9 +95,9 @@ export function LearntKanjiContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Header route="learnt" />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <div className="p-6 border-b">
           <h1 className="text-3xl font-bold mb-4">Learnt Kanji</h1>
 
@@ -167,7 +167,7 @@ export function LearntKanjiContent() {
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-6">
+          <div className={`p-6 ${practiceKanji.length > 0 ? "pb-24" : ""}`}>
             {learntKanjiData.length === 0 ? (
               <div className="text-center py-12">
                 <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
