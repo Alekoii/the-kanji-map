@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, SlidersHorizontal } from "lucide-react";
 
 export interface KanjiFilters {
@@ -74,8 +75,8 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
     }
   };
 
-  const hasActiveFilters = filters.searchType !== "all" ||
-                          filters.type !== "all" ||
+  // searchType is now always visible in dropdown, so don't count it as active filter
+  const hasActiveFilters = filters.type !== "all" ||
                           filters.jlptLevels.length > 0 ||
                           filters.strokeRange.min !== 1 ||
                           filters.strokeRange.max !== 30 ||
@@ -84,9 +85,7 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
   const getActiveFilterChips = () => {
     const chips: { label: string; key: keyof KanjiFilters }[] = [];
 
-    if (filters.searchType !== "all") {
-      chips.push({ label: `Search: ${filters.searchType}`, key: "searchType" });
-    }
+    // searchType is now always visible in dropdown, so don't show as chip
     if (filters.type !== "all") {
       chips.push({ label: filters.type === "joyo" ? "Jōyō" : filters.type === "jinmeiyo" ? "Jinmeiyō" : "Other", key: "type" });
     }
@@ -109,14 +108,28 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
     <div className="space-y-3">
       {/* Main Search and Filter Bar */}
       <div className="flex gap-2 items-center">
-        <div className="flex-1">
+        <div className="flex-1 flex gap-2">
           <Input
             id="search"
             placeholder="Search kanji, meaning, or reading..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
-            className="h-10"
+            className="h-10 flex-1"
           />
+          <Select
+            value={filters.searchType}
+            onValueChange={(value) => updateFilter("searchType", value as KanjiFilters["searchType"])}
+          >
+            <SelectTrigger className="w-[140px] h-10">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Fields</SelectItem>
+              <SelectItem value="kanji">Kanji</SelectItem>
+              <SelectItem value="meaning">Meaning</SelectItem>
+              <SelectItem value="reading">Reading</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -146,40 +159,6 @@ export function KanjiFilter({ filters, onFiltersChange, totalCount, filteredCoun
             </SheetHeader>
 
             <div className="mt-6 space-y-6">
-                {/* Search Type */}
-                <div className="space-y-3">
-                  <Label>Search In</Label>
-                  <RadioGroup
-                    value={filters.searchType}
-                    onValueChange={(value) => updateFilter("searchType", value as KanjiFilters["searchType"])}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="all" id="search-all" />
-                      <Label htmlFor="search-all" className="font-normal cursor-pointer">
-                        All Fields
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="kanji" id="search-kanji" />
-                      <Label htmlFor="search-kanji" className="font-normal cursor-pointer">
-                        Kanji Character Only
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="meaning" id="search-meaning" />
-                      <Label htmlFor="search-meaning" className="font-normal cursor-pointer">
-                        Meaning Only
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="reading" id="search-reading" />
-                      <Label htmlFor="search-reading" className="font-normal cursor-pointer">
-                        Reading Only
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
                 {/* Kanji Type */}
                 <div className="space-y-3">
                   <Label>Kanji Type</Label>
