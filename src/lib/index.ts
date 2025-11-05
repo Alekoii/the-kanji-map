@@ -184,3 +184,55 @@ export const getGraphData = async (id: string) => {
 
   return { withOutLinks, noOutLinks };
 };
+
+/**
+ * Creates a complete graph of all kanji associations from the composition data
+ * @returns GraphData containing all kanji nodes and their association links
+ */
+export const getAllKanjiGraphData = async (): Promise<GraphData> => {
+  const allKanji = Object.keys(composition);
+  const links: { source: string; target: string }[] = [];
+
+  // Build all links from the composition data
+  allKanji.forEach((kanji) => {
+    const compositionData = composition[kanji as keyof typeof composition];
+
+    // Add incoming links (components that make up this kanji)
+    compositionData.in.forEach((component) => {
+      if (component !== kanji && allKanji.includes(component)) {
+        links.push({ source: component, target: kanji });
+      }
+    });
+
+    // Add outgoing links (kanji that this is a component of)
+    compositionData.out.forEach((parent) => {
+      if (parent !== kanji && allKanji.includes(parent)) {
+        links.push({ source: kanji, target: parent });
+      }
+    });
+  });
+
+  // Remove duplicate links
+  const uniqueLinks = links.filter(
+    (value, index, self) =>
+      index ===
+      self.findIndex(
+        (t) => t.source === value.source && t.target === value.target
+      )
+  );
+
+  // Create nodes with their data
+  const nodes = await Promise.all(
+    allKanji.map(async (kanji) => {
+      return {
+        id: kanji,
+        data: await getKanjiDataLocal(kanji),
+      };
+    })
+  );
+
+  return {
+    nodes: nodes.filter((node) => node.data !== null),
+    links: uniqueLinks,
+  };
+};

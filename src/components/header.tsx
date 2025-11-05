@@ -1,4 +1,4 @@
-import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon, TrophyIcon } from "lucide-react";
+import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon, TrophyIcon, NetworkIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { buttonVariants } from "./ui/button";
@@ -102,6 +102,23 @@ export const Header = ({
           </TooltipTrigger>
           <TooltipContent>
             <p>Learnt Kanji</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={route === "associations" ? "/" : "/associations"}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                route === "associations" ? "bg-accent text-accent-foreground" : "",
+              )}
+            >
+              <NetworkIcon className={cn("size-5")} />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>3D Associations Network</p>
           </TooltipContent>
         </Tooltip>
 
