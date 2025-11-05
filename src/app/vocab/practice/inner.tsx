@@ -58,7 +58,7 @@ export function VocabPracticeGameContent() {
   const questions = useMemo(() => {
     if (practiceVocabData.length === 0) return [];
 
-    return practiceVocabData.map((vocab) => {
+    const generatedQuestions = practiceVocabData.map((vocab) => {
       const correctAnswer = vocab.meaning;
 
       // Get wrong answers from other vocab
@@ -84,6 +84,9 @@ export function VocabPracticeGameContent() {
         tags: vocab.tags,
       };
     });
+
+    // Shuffle questions for random order
+    return generatedQuestions.sort(() => Math.random() - 0.5);
   }, [practiceVocabData]);
 
   const currentQuestion = questions[currentQuestionIndex];

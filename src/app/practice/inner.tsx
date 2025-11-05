@@ -90,7 +90,7 @@ export function PracticeGameContent() {
   const questions = useMemo(() => {
     if (practiceKanjiData.length === 0) return [];
 
-    return practiceKanjiData.map((kanji) => {
+    const generatedQuestions = practiceKanjiData.map((kanji) => {
       const correctAnswer = kanji.m;
 
       // Get wrong answers from other kanji
@@ -114,6 +114,9 @@ export function PracticeGameContent() {
         options,
       };
     });
+
+    // Shuffle questions for random order
+    return generatedQuestions.sort(() => Math.random() - 0.5);
   }, [practiceKanjiData]);
 
   const currentQuestion = questions[currentQuestionIndex];
