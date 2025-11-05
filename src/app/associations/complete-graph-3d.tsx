@@ -52,9 +52,25 @@ const CompleteGraph3D = ({
   const [highlightNodes, setHighlightNodes] = React.useState<Set<string>>(new Set());
   const [highlightLinks, setHighlightLinks] = React.useState<Set<any>>(new Set());
 
+  // Cache for THREE.js node objects to prevent recreation
+  const nodeObjectsCache = React.useRef<Map<string, THREE.Group>>(new Map());
+
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
+      // Clean up THREE.js objects cache
+      nodeObjectsCache.current.forEach((group) => {
+        group.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+            if (child.material instanceof THREE.Material) {
+              child.material.dispose();
+            }
+          }
+        });
+      });
+      nodeObjectsCache.current.clear();
+
       if (fg3DRef.current) {
         fg3DRef.current.renderer().dispose();
         fg3DRef.current.scene().clear();
@@ -65,6 +81,19 @@ const CompleteGraph3D = ({
   // Filter data based on joyoOnly setting
   React.useEffect(() => {
     if (!graphData) return;
+
+    // Clear cache when data changes to free memory
+    nodeObjectsCache.current.forEach((group) => {
+      group.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          if (child.material instanceof THREE.Material) {
+            child.material.dispose();
+          }
+        }
+      });
+    });
+    nodeObjectsCache.current.clear();
 
     if (joyoOnly) {
       const joyoNodes = graphData.nodes.filter((node: NodeObject) =>
@@ -144,8 +173,8 @@ const CompleteGraph3D = ({
   React.useEffect(() => {
     if (!data?.nodes) return;
 
-    // Only prefetch a subset to avoid overwhelming the browser
-    const nodesToPrefetch = data.nodes.slice(0, 100);
+    // Only prefetch a small subset to reduce memory usage
+    const nodesToPrefetch = data.nodes.slice(0, 20);
     nodesToPrefetch.forEach((node) => {
       void router.prefetch(`/${node.id}`);
     });
@@ -286,8 +315,8 @@ const CompleteGraph3D = ({
       enableNavigationControls={true}
       showNavInfo={false}
       ref={fg3DRef}
-      warmupTicks={100}
-      cooldownTime={5000}
+      warmupTicks={50}
+      cooldownTime={2000}
       onNodeClick={handleClick}
       onNodeHover={handleHover}
       nodeLabel={(n) => {
@@ -305,6 +334,14 @@ const CompleteGraph3D = ({
         const nodeId = String(node.id);
         const isHighlighted = highlightNodes.has(nodeId);
         const isSelected = selectedNode?.id === node.id;
+
+        // Create a cache key based on appearance state
+        const cacheKey = `${nodeId}-${isSelected ? 's' : ''}${isHighlighted ? 'h' : 'n'}`;
+
+        // Check if we already have this object cached
+        if (nodeObjectsCache.current.has(cacheKey)) {
+          return nodeObjectsCache.current.get(cacheKey)!;
+        }
 
         let color = getNodeDefaultColor(nodeId);
         let size = 5;
@@ -342,6 +379,10 @@ const CompleteGraph3D = ({
         const group = new THREE.Group();
         group.add(sprite);
         group.add(ball);
+
+        // Cache the created object
+        nodeObjectsCache.current.set(cacheKey, group);
+
         return group;
       }}
       linkThreeObjectExtend={false}
