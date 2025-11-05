@@ -23,8 +23,6 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const navItems = [
-  { href: "/list", label: "Kanji List", route: "list" },
-  { href: "/radicals", label: "Radicals", route: "radicals" },
   { href: "/practice", label: "Practice", route: "practice" },
   { href: "/learnt", label: "Learnt", route: "learnt" },
   { href: "/associations", label: "Associations", route: "associations" },
