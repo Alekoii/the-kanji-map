@@ -3,6 +3,7 @@ import { Header } from "@/components/header";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Metadata } from "next";
+import { ProgressManager } from "@/components/progress-manager";
 
 export const metadata: Metadata = {
   title: "About Kanji Learn - Interactive Japanese Kanji Learning Tool",
@@ -19,10 +20,13 @@ const About = () => {
             <h1 className="text-3xl font-extrabold tracking-tight mt-4 mb-4">
               About
             </h1>
-            <p>
+            <p className="mb-8">
               Kanji Learn is a Japanese language learning tool that shows
               kanji information and decomposition in graph form.
             </p>
+
+            <ProgressManager />
+
             <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-4">
               Giving Back
             </h1>
