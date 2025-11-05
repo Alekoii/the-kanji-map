@@ -135,7 +135,7 @@ export function AssociationsContent({ graphData }: Props) {
       </div>
 
       {/* Controls */}
-      <div className="absolute bottom-4 right-4 p-4 bg-background/80 backdrop-blur-sm rounded-lg border flex gap-1">
+      <div className="absolute bottom-4 right-4 z-50 p-4 bg-background/80 backdrop-blur-sm rounded-lg border flex gap-1">
         <div>
           <Tooltip>
             <TooltipTrigger asChild>
