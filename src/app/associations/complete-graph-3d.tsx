@@ -301,41 +301,50 @@ const CompleteGraph3D = ({
                 </div>
                `;
       }}
-      nodeColor={(node: NodeObject) => {
+      nodeThreeObject={(node: NodeObject) => {
         const nodeId = String(node.id);
         const isHighlighted = highlightNodes.has(nodeId);
         const isSelected = selectedNode?.id === node.id;
+
+        let color = getNodeDefaultColor(nodeId);
+        let size = 5;
+        let textHeight = 6;
 
         // Highlight selected node
         if (isSelected) {
-          return "#ff0080"; // Magenta for selected
+          color = "#ff0080"; // Magenta for selected
+          size = 8;
+          textHeight = 9;
+        } else if (isHighlighted) {
+          // Highlighted connected nodes
+          size = 7;
+          textHeight = 7.5;
         }
 
-        // Return default color based on type
-        return getNodeDefaultColor(nodeId);
-      }}
-      nodeRelSize={5}
-      nodeVal={(node: NodeObject) => {
-        const nodeId = String(node.id);
-        const isHighlighted = highlightNodes.has(nodeId);
-        const isSelected = selectedNode?.id === node.id;
+        const ball = new THREE.Mesh(
+          new THREE.SphereGeometry(size, 16, 16),
+          new THREE.MeshLambertMaterial({
+            color: color,
+            transparent: true,
+            depthWrite: false,
+            opacity: isHighlighted || isSelected ? 1.0 : 0.95,
+          }),
+        );
 
-        if (isSelected) return 8;
-        if (isHighlighted) return 7;
-        return 5;
-      }}
-      nodeOpacity={0.95}
-      nodeThreeObject={(node: NodeObject) => {
         const sprite = new SpriteText(String(node.id));
         sprite.fontFace =
           "Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif";
         sprite.color = "#000";
-        sprite.textHeight = 6;
+        sprite.textHeight = textHeight;
         sprite.fontSize = 80;
         sprite.padding = 2;
-        return sprite;
+
+        const group = new THREE.Group();
+        group.add(sprite);
+        group.add(ball);
+        return group;
       }}
-      nodeThreeObjectExtend={true}
+      linkThreeObjectExtend={false}
     />
   );
 };
