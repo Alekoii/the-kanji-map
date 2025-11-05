@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import { useAtom } from "jotai";
 import { practiceKanjiAtom, learntKanjiAtom } from "@/lib/store";
 import { KanjiCard } from "@/components/kanji-card";
-import { KanjiFilter, type KanjiFilters } from "@/components/kanji-filter";
+import { KanjiFilter } from "@/components/kanji-filter";
+import { KanjiFilterSidebar, type KanjiFilters } from "@/components/kanji-filter-sidebar";
 import { KanjiModal } from "@/components/kanji-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -257,14 +258,12 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
     return (
       <>
         <div className="flex flex-col h-full">
-          <div className="p-4">
-            <KanjiFilter
-              filters={filters}
-              onFiltersChange={setFilters}
-              totalCount={kanjiData.length}
-              filteredCount={filteredKanji.length}
-            />
-          </div>
+          <KanjiFilterSidebar
+            filters={filters}
+            onFiltersChange={setFilters}
+            totalCount={kanjiData.length}
+            filteredCount={filteredKanji.length}
+          />
 
           {/* Bulk Selection Controls */}
           {currentKanji.length > 0 && (
@@ -379,18 +378,20 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
 
   return (
     <>
-      <div className="flex flex-col h-full">
-        <div className="p-6 pb-0">
-          <KanjiFilter
-            filters={filters}
-            onFiltersChange={setFilters}
-            totalCount={kanjiData.length}
-            filteredCount={filteredKanji.length}
-          />
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-6">
-            <div className="mb-6">
+      <div className="flex h-full">
+        {/* Left Sidebar */}
+        <KanjiFilterSidebar
+          filters={filters}
+          onFiltersChange={setFilters}
+          totalCount={kanjiData.length}
+          filteredCount={filteredKanji.length}
+        />
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <ScrollArea className="flex-1">
+            <div className="p-6">
+              <div className="mb-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
                   <h1 className="text-3xl font-bold mb-2">Kanji Explorer</h1>
@@ -480,6 +481,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
             )}
           </div>
         </ScrollArea>
+        </div>
       </div>
       {selectedKanji && (
         <KanjiModal
