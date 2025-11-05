@@ -6,7 +6,7 @@ import { practiceKanjiAtom, learntKanjiAtom } from "@/lib/store";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import searchlist from "@/../data/searchlist.json";
-import { CheckCircle2Icon, XCircleIcon, PlayIcon } from "lucide-react";
+import { CheckCircle2Icon, XCircleIcon, PlayIcon, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -25,6 +25,39 @@ type QuizQuestion = {
   options: string[];
 };
 
+type FullKanjiData = {
+  kanjialiveData?: {
+    kanji?: {
+      onyomi?: {
+        romaji: string;
+        katakana: string;
+      };
+      kunyomi?: {
+        romaji: string;
+        hiragana: string;
+      };
+    };
+  };
+  jishoData?: {
+    onyomi?: string[];
+    kunyomi?: string[];
+    onyomiExamples?: Array<{
+      example: string;
+      reading: string;
+      audio?: {
+        mp3?: string;
+      };
+    }>;
+    kunyomiExamples?: Array<{
+      example: string;
+      reading: string;
+      audio?: {
+        mp3?: string;
+      };
+    }>;
+  };
+};
+
 export function PracticeGameContent() {
   const [practiceKanji] = useAtom(practiceKanjiAtom);
   const [learntKanji, setLearntKanji] = useAtom(learntKanjiAtom);
@@ -33,6 +66,8 @@ export function PracticeGameContent() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
+  const [currentKanjiData, setCurrentKanjiData] = useState<FullKanjiData | null>(null);
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null);
 
   // Get kanji that are still being learned (score < 20)
   const learningKanji = useMemo(() => {
@@ -85,6 +120,50 @@ export function PracticeGameContent() {
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  // Fetch full kanji data when question changes
+  useEffect(() => {
+    if (!currentQuestion) return;
+
+    const fetchKanjiData = async () => {
+      try {
+        const response = await fetch(`/data/kanji/${currentQuestion.kanji}.json`);
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentKanjiData(data);
+        } else {
+          setCurrentKanjiData(null);
+        }
+      } catch (error) {
+        console.error("Error fetching kanji data:", error);
+        setCurrentKanjiData(null);
+      }
+    };
+
+    fetchKanjiData();
+  }, [currentQuestion]);
+
+  // Play audio for readings
+  const playAudio = (audioUrl: string, type: string) => {
+    if (!audioUrl) return;
+
+    setPlayingAudio(type);
+    const audio = new Audio(audioUrl);
+
+    audio.onended = () => {
+      setPlayingAudio(null);
+    };
+
+    audio.onerror = () => {
+      setPlayingAudio(null);
+      console.error("Error playing audio");
+    };
+
+    audio.play().catch(error => {
+      console.error("Error playing audio:", error);
+      setPlayingAudio(null);
+    });
+  };
+
   const handleAnswerSelect = (answer: string) => {
     if (showResult) return;
 
@@ -115,6 +194,7 @@ export function PracticeGameContent() {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      setPlayingAudio(null);
     } else {
       setGameComplete(true);
     }
@@ -233,6 +313,85 @@ export function PracticeGameContent() {
                 What is the meaning of this kanji?
               </h2>
               <div className="text-9xl font-bold py-8">{currentQuestion.kanji}</div>
+
+              {/* Onyomi and Kunyomi readings with audio */}
+              {currentKanjiData && (
+                <div className="flex flex-wrap gap-3 justify-center items-center">
+                  {/* Onyomi */}
+                  {currentKanjiData.kanjialiveData?.kanji?.onyomi && (
+                    <button
+                      onClick={() => {
+                        const audioUrl = currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3;
+                        if (audioUrl) {
+                          playAudio(audioUrl, 'onyomi');
+                        }
+                      }}
+                      disabled={!currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all",
+                        "hover:border-primary hover:bg-accent",
+                        currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3
+                          ? "cursor-pointer"
+                          : "cursor-default opacity-60",
+                        playingAudio === 'onyomi' && "border-primary bg-accent"
+                      )}
+                    >
+                      <div className="text-left">
+                        <div className="text-xs text-muted-foreground">On'yomi</div>
+                        <div className="text-lg font-medium">
+                          {currentKanjiData.kanjialiveData.kanji.onyomi.katakana}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {currentKanjiData.kanjialiveData.kanji.onyomi.romaji}
+                        </div>
+                      </div>
+                      {currentKanjiData.jishoData?.onyomiExamples?.[0]?.audio?.mp3 && (
+                        <Volume2 className={cn(
+                          "h-5 w-5 text-muted-foreground",
+                          playingAudio === 'onyomi' && "text-primary animate-pulse"
+                        )} />
+                      )}
+                    </button>
+                  )}
+
+                  {/* Kunyomi */}
+                  {currentKanjiData.kanjialiveData?.kanji?.kunyomi && (
+                    <button
+                      onClick={() => {
+                        const audioUrl = currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3;
+                        if (audioUrl) {
+                          playAudio(audioUrl, 'kunyomi');
+                        }
+                      }}
+                      disabled={!currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all",
+                        "hover:border-primary hover:bg-accent",
+                        currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3
+                          ? "cursor-pointer"
+                          : "cursor-default opacity-60",
+                        playingAudio === 'kunyomi' && "border-primary bg-accent"
+                      )}
+                    >
+                      <div className="text-left">
+                        <div className="text-xs text-muted-foreground">Kun'yomi</div>
+                        <div className="text-lg font-medium">
+                          {currentKanjiData.kanjialiveData.kanji.kunyomi.hiragana}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {currentKanjiData.kanjialiveData.kanji.kunyomi.romaji}
+                        </div>
+                      </div>
+                      {currentKanjiData.jishoData?.kunyomiExamples?.[0]?.audio?.mp3 && (
+                        <Volume2 className={cn(
+                          "h-5 w-5 text-muted-foreground",
+                          playingAudio === 'kunyomi' && "text-primary animate-pulse"
+                        )} />
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Answer options */}
