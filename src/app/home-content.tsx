@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useAtom } from "jotai";
-import { practiceKanjiAtom } from "@/lib/store";
+import { practiceKanjiAtom, learntKanjiAtom } from "@/lib/store";
 import { KanjiCard } from "@/components/kanji-card";
 import { KanjiFilter, type KanjiFilters } from "@/components/kanji-filter";
 import { KanjiModal } from "@/components/kanji-modal";
@@ -40,6 +40,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [practiceKanji, setPracticeKanji] = useAtom(practiceKanjiAtom);
+  const [learntKanji] = useAtom(learntKanjiAtom);
   const itemsPerPage = isMobile ? 20 : 48;
 
   const handleKanjiClick = (kanji: string) => {
@@ -313,6 +314,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
                   onClick={() => handleKanjiClick(item.k)}
                   onExpandClick={(e) => handleExpandClick(item.k, e)}
                   isSelected={practiceKanji.includes(item.k)}
+                  learningScore={learntKanji[item.k]}
                 />
               ))}
             </div>
@@ -443,6 +445,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
                     onClick={() => handleKanjiClick(item.k)}
                     onExpandClick={(e) => handleExpandClick(item.k, e)}
                     isSelected={practiceKanji.includes(item.k)}
+                    learningScore={learntKanji[item.k]}
                   />
                 ))}
               </div>

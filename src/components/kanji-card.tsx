@@ -11,6 +11,7 @@ interface KanjiCardProps {
   onClick?: () => void;
   onExpandClick?: (e: React.MouseEvent) => void;
   isSelected?: boolean;
+  learningScore?: number;
 }
 
 export function KanjiCard({
@@ -20,7 +21,8 @@ export function KanjiCard({
   showDetails = false,
   onClick,
   onExpandClick,
-  isSelected = false
+  isSelected = false,
+  learningScore
 }: KanjiCardProps) {
   const getKanjiType = () => {
     if (joyoList.includes(kanji)) return "Jōyō";
@@ -34,6 +36,27 @@ export function KanjiCard({
     return "bg-gray-500/10 text-gray-500";
   };
 
+  const getLearningBadgeColor = (score: number) => {
+    if (score >= 20) return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
+    if (score >= 10) return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+    if (score > 0) return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20";
+    return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
+  };
+
+  const getLearningLabel = (score: number) => {
+    if (score >= 20) return "Mastered";
+    if (score >= 10) return "Proficient";
+    if (score > 0) return "Learning";
+    return "Struggling";
+  };
+
+  const getProgressBarColor = (score: number) => {
+    if (score >= 20) return "bg-green-500";
+    if (score >= 10) return "bg-blue-500";
+    if (score > 0) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
   return (
     <div
       onClick={onClick}
@@ -41,7 +64,7 @@ export function KanjiCard({
         isSelected
           ? "border-primary bg-primary/5"
           : "border-border hover:border-primary"
-      }`}
+      } ${learningScore !== undefined ? "pb-10" : ""}`}
     >
       <div className="flex items-start justify-between mb-2">
         <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
@@ -76,6 +99,29 @@ export function KanjiCard({
               訓: {kunyomi}
             </p>
           )}
+        </div>
+      )}
+
+      {/* Learning Progress Indicator */}
+      {learningScore !== undefined && (
+        <div className="absolute bottom-0 left-0 right-0">
+          <div className="px-2 pb-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className={`text-[10px] font-medium ${getLearningBadgeColor(learningScore)}`}>
+                {getLearningLabel(learningScore)}
+              </span>
+              <span className={`text-[10px] font-bold ${getLearningBadgeColor(learningScore)}`}>
+                {learningScore > 0 ? '+' : ''}{learningScore}
+              </span>
+            </div>
+            {/* Progress bar */}
+            <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 ${getProgressBarColor(learningScore)}`}
+                style={{ width: `${Math.abs(learningScore) * 5}%` }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
