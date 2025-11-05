@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import searchlist from "@/../data/searchlist.json";
 import { joyoList } from "@/../data/joyo";
 import { jinmeiyoList } from "@/../data/jinmeiyo";
-import { PlayIcon, Trash2Icon } from "lucide-react";
+import { PlayIcon, Trash2Icon, CheckSquare, ListChecks, Shuffle } from "lucide-react";
 import Link from "next/link";
 
 interface KanjiItem {
@@ -60,6 +60,32 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
 
   const clearAllSelections = () => {
     setPracticeKanji([]);
+  };
+
+  const selectFirst10 = () => {
+    const first10 = currentKanji.slice(0, 10).map((item) => item.k);
+    setPracticeKanji((prev) => {
+      const newSet = new Set([...prev, ...first10]);
+      return Array.from(newSet);
+    });
+  };
+
+  const selectAllOnPage = () => {
+    const allOnPage = currentKanji.map((item) => item.k);
+    setPracticeKanji((prev) => {
+      const newSet = new Set([...prev, ...allOnPage]);
+      return Array.from(newSet);
+    });
+  };
+
+  const selectRandom = () => {
+    const count = Math.min(10, currentKanji.length);
+    const shuffled = [...currentKanji].sort(() => Math.random() - 0.5);
+    const randomKanji = shuffled.slice(0, count).map((item) => item.k);
+    setPracticeKanji((prev) => {
+      const newSet = new Set([...prev, ...randomKanji]);
+      return Array.from(newSet);
+    });
   };
 
   const handleCloseModal = () => {
@@ -238,6 +264,43 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
               filteredCount={filteredKanji.length}
             />
           </div>
+
+          {/* Bulk Selection Controls */}
+          {currentKanji.length > 0 && (
+            <div className="px-4 pb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-muted-foreground mr-1">Quick select:</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectFirst10}
+                  className="h-8 text-xs"
+                >
+                  <CheckSquare className="h-3 w-3 mr-1" />
+                  First 10
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectAllOnPage}
+                  className="h-8 text-xs"
+                >
+                  <ListChecks className="h-3 w-3 mr-1" />
+                  All on Page
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={selectRandom}
+                  className="h-8 text-xs"
+                >
+                  <Shuffle className="h-3 w-3 mr-1" />
+                  Random 10
+                </Button>
+              </div>
+            </div>
+          )}
+
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
               {currentKanji.map((item) => (
@@ -326,11 +389,46 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
         <ScrollArea className="flex-1">
           <div className="p-6">
             <div className="mb-6">
-              <h1 className="text-3xl font-bold mb-2">Kanji Explorer</h1>
-              <p className="text-muted-foreground">
-                Showing {startIndex + 1}-{Math.min(endIndex, filteredKanji.length)} of{" "}
-                {filteredKanji.length} kanji
-              </p>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Kanji Explorer</h1>
+                  <p className="text-muted-foreground">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredKanji.length)} of{" "}
+                    {filteredKanji.length} kanji
+                  </p>
+                </div>
+
+                {/* Bulk Selection Controls */}
+                {currentKanji.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Quick select:</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={selectFirst10}
+                    >
+                      <CheckSquare className="h-4 w-4 mr-1.5" />
+                      First 10
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={selectAllOnPage}
+                    >
+                      <ListChecks className="h-4 w-4 mr-1.5" />
+                      All on Page
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={selectRandom}
+                    >
+                      <Shuffle className="h-4 w-4 mr-1.5" />
+                      Random 10
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {currentKanji.length > 0 ? (
