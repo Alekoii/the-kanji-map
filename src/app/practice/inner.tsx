@@ -34,12 +34,24 @@ export function PracticeGameContent() {
   const [showResult, setShowResult] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
 
-  // Get kanji data for practice
+  // Get kanji that are still being learned (score < 20)
+  const learningKanji = useMemo(() => {
+    const learning = Object.entries(learntKanji)
+      .filter(([, score]) => score < 20) // Not mastered yet
+      .sort(([, a], [, b]) => a - b) // Sort by score (lowest first)
+      .map(([kanji]) => kanji);
+
+    // Return up to 20 kanji for practice
+    return learning.slice(0, 20);
+  }, [learntKanji]);
+
+  // Get kanji data for practice - use selected kanji or auto-select learning kanji
   const practiceKanjiData = useMemo(() => {
-    return practiceKanji
+    const kanjiToUse = practiceKanji.length > 0 ? practiceKanji : learningKanji;
+    return kanjiToUse
       .map((id) => searchlist.find((k) => k.k === id))
       .filter(Boolean) as KanjiData[];
-  }, [practiceKanji]);
+  }, [practiceKanji, learningKanji]);
 
   // Generate quiz questions
   const questions = useMemo(() => {
@@ -116,15 +128,18 @@ export function PracticeGameContent() {
     setGameComplete(false);
   };
 
-  if (practiceKanji.length === 0) {
+  // Show message only if no kanji selected AND no learning kanji available
+  if (practiceKanjiData.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header route="practice" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4 max-w-md">
-            <h2 className="text-2xl font-bold">No Kanji Selected</h2>
+            <h2 className="text-2xl font-bold">No Kanji to Practice</h2>
             <p className="text-muted-foreground">
-              Please select some kanji from the home page to start practicing.
+              {practiceKanji.length === 0
+                ? "You haven't selected any kanji or practiced any yet. Start by selecting kanji from the home page."
+                : "No practice kanji found. Please select some kanji from the home page."}
             </p>
             <Link href="/">
               <Button>Go to Home Page</Button>
@@ -134,6 +149,9 @@ export function PracticeGameContent() {
       </div>
     );
   }
+
+  // Show indicator when using auto-selected learning kanji
+  const isAutoSelected = practiceKanji.length === 0 && learningKanji.length > 0;
 
   if (gameComplete) {
     const percentage = Math.round((score / questions.length) * 100);
@@ -173,6 +191,17 @@ export function PracticeGameContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header route="practice" />
+
+      {/* Auto-selected banner */}
+      {isAutoSelected && (
+        <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-3">
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-sm text-blue-600 dark:text-blue-400">
+              📚 Practicing {learningKanji.length} kanji you're still learning (not yet mastered)
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Scrollable content area */}
       <div className="flex-1 overflow-y-auto">
