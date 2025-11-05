@@ -72,9 +72,15 @@ const joyoOnlyAtom = atom(
 // Practice kanji selection - stores array of kanji IDs to practice
 const practiceKanjiAtom = atomWithStorage<string[]>("practiceKanji", []);
 
+// Learnt kanji tracking - stores kanji scores from -20 to 20
+// +1 for correct, -1 for incorrect, +20 is mastered
+type LearntKanjiScores = Record<string, number>;
+const learntKanjiAtom = atomWithStorage<LearntKanjiScores>("learntKanji", {});
+
 export {
   graphPreferenceAtom,
   joyoOnlyAtom,
+  learntKanjiAtom,
   outLinksAtom,
   particlesAtom,
   practiceKanjiAtom,

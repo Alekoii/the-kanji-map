@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useAtom } from "jotai";
-import { practiceKanjiAtom } from "@/lib/store";
+import { practiceKanjiAtom, learntKanjiAtom } from "@/lib/store";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import searchlist from "@/../data/searchlist.json";
@@ -27,6 +27,7 @@ type QuizQuestion = {
 
 export function PracticeGameContent() {
   const [practiceKanji] = useAtom(practiceKanjiAtom);
+  const [learntKanji, setLearntKanji] = useAtom(learntKanjiAtom);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -78,9 +79,23 @@ export function PracticeGameContent() {
     setSelectedAnswer(answer);
     setShowResult(true);
 
-    if (answer === currentQuestion.correctAnswer) {
+    const isCorrect = answer === currentQuestion.correctAnswer;
+    if (isCorrect) {
       setScore(score + 1);
     }
+
+    // Update learnt kanji score
+    const kanji = currentQuestion.kanji;
+    setLearntKanji((prev) => {
+      const currentScore = prev[kanji] || 0;
+      const newScore = isCorrect
+        ? Math.min(currentScore + 1, 20)  // +1 for correct, max 20
+        : Math.max(currentScore - 1, -20); // -1 for incorrect, min -20
+      return {
+        ...prev,
+        [kanji]: newScore,
+      };
+    });
   };
 
   const handleNext = () => {

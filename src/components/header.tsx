@@ -1,4 +1,4 @@
-import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon } from "lucide-react";
+import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon, TrophyIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { buttonVariants } from "./ui/button";
@@ -85,6 +85,23 @@ export const Header = ({
           </TooltipTrigger>
           <TooltipContent>
             <p>Practice Game</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={route === "learnt" ? "/" : "/learnt"}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                route === "learnt" ? "bg-accent text-accent-foreground" : "",
+              )}
+            >
+              <TrophyIcon className={cn("size-5")} />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Learnt Kanji</p>
           </TooltipContent>
         </Tooltip>
 
