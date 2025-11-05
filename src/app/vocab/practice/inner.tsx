@@ -35,7 +35,7 @@ export function VocabPracticeGameContent() {
   const [showResult, setShowResult] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
 
-  // Get vocab that are still being learned (score < 20)
+  // Get vocab that are still being learned (score < 20) - only calculated once at start
   const learningVocab = useMemo(() => {
     const learning = Object.entries(learntVocab)
       .filter(([, score]) => score < 20) // Not mastered yet
@@ -44,15 +44,15 @@ export function VocabPracticeGameContent() {
 
     // Return up to 20 vocab for practice
     return learning.slice(0, 20);
-  }, [learntVocab]);
+  }, []); // Empty dependency array - only calculate once at mount
 
-  // Get vocab data for practice - use selected vocab or auto-select learning vocab
+  // Get vocab data for practice - only calculated once at start
   const practiceVocabData = useMemo(() => {
     const vocabToUse = practiceVocab.length > 0 ? practiceVocab : learningVocab;
     return vocabToUse
       .map((expression) => vocablist.find((v) => v.expression === expression))
       .filter(Boolean) as VocabData[];
-  }, [practiceVocab, learningVocab]);
+  }, []); // Empty dependency array - only calculate once at mount
 
   // Generate quiz questions
   const questions = useMemo(() => {
@@ -87,7 +87,7 @@ export function VocabPracticeGameContent() {
 
     // Shuffle questions for random order
     return generatedQuestions.sort(() => Math.random() - 0.5);
-  }, [practiceVocabData]);
+  }, []); // Empty dependency array - only calculate once at mount
 
   const currentQuestion = questions[currentQuestionIndex];
 

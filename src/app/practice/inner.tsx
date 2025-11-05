@@ -67,7 +67,7 @@ export function PracticeGameContent() {
   const [currentKanjiData, setCurrentKanjiData] = useState<FullKanjiData | null>(null);
   const [playingAudio, setPlayingAudio] = useState<string | null>(null);
 
-  // Get kanji that are still being learned (score < 20)
+  // Get kanji that are still being learned (score < 20) - only calculated once at start
   const learningKanji = useMemo(() => {
     const learning = Object.entries(learntKanji)
       .filter(([, score]) => score < 20) // Not mastered yet
@@ -76,17 +76,17 @@ export function PracticeGameContent() {
 
     // Return up to 20 kanji for practice
     return learning.slice(0, 20);
-  }, [learntKanji]);
+  }, []); // Empty dependency array - only calculate once at mount
 
-  // Get kanji data for practice - use selected kanji or auto-select learning kanji
+  // Get kanji data for practice - only calculated once at start
   const practiceKanjiData = useMemo(() => {
     const kanjiToUse = practiceKanji.length > 0 ? practiceKanji : learningKanji;
     return kanjiToUse
       .map((id) => searchlist.find((k) => k.k === id))
       .filter(Boolean) as KanjiData[];
-  }, [practiceKanji, learningKanji]);
+  }, []); // Empty dependency array - only calculate once at mount
 
-  // Generate quiz questions
+  // Generate quiz questions - only calculated once at start
   const questions = useMemo(() => {
     if (practiceKanjiData.length === 0) return [];
 
@@ -117,7 +117,7 @@ export function PracticeGameContent() {
 
     // Shuffle questions for random order
     return generatedQuestions.sort(() => Math.random() - 0.5);
-  }, [practiceKanjiData]);
+  }, []); // Empty dependency array - only calculate once at mount
 
   const currentQuestion = questions[currentQuestionIndex];
 
