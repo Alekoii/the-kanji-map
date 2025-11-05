@@ -1,7 +1,7 @@
 import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon, TrophyIcon, NetworkIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { buttonVariants } from "./ui/button";
+import { buttonVariants, Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcherButton } from "./theme-switcher";
 import {
@@ -147,6 +147,12 @@ export const Header = ({
             <p>Change theme</p>
           </TooltipContent>
         </Tooltip>
+
+        <Button asChild variant="default" size="sm" className="ml-2">
+          <a href="https://asakiri.com" target="_blank" rel="noopener noreferrer">
+            Check out Asakiri
+          </a>
+        </Button>
       </div>
     </div>
   );
