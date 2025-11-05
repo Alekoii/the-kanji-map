@@ -43,27 +43,27 @@ export function VocabCard({
       )}
       onClick={onClick}
     >
-      <CardContent className="p-4 space-y-2">
+      <CardContent className="p-3 space-y-1">
         {/* Learning score indicator */}
         {learningScore > 0 && (
-          <div className="absolute top-2 right-2">
-            <CheckCircle2 className={cn("h-5 w-5", getLearningColor(learningScore))} />
+          <div className="absolute top-1.5 right-1.5">
+            <CheckCircle2 className={cn("h-4 w-4", getLearningColor(learningScore))} />
           </div>
         )}
 
         {/* Expression */}
-        <div className="text-2xl font-bold text-center mb-1">{expression}</div>
+        <div className="text-xl font-bold text-center">{expression}</div>
 
         {/* Reading */}
-        <div className="text-sm text-muted-foreground text-center">{reading}</div>
+        <div className="text-xs text-muted-foreground text-center">{reading}</div>
 
         {/* Meaning */}
-        <div className="text-sm text-center line-clamp-2 min-h-[2.5rem]">{meaning}</div>
+        <div className="text-xs text-center line-clamp-2 min-h-[2rem]">{meaning}</div>
 
         {/* Tags */}
         {primaryTag && (
-          <div className="flex justify-center pt-2">
-            <Badge variant="secondary" className="text-xs">
+          <div className="flex justify-center pt-1">
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
               {primaryTag.replace(/_/g, " ")}
             </Badge>
           </div>
