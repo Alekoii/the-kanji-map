@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from "react";
 import { useAtom } from "jotai";
-import { learntKanjiAtom } from "@/lib/store";
+import { learntKanjiAtom, practiceKanjiAtom } from "@/lib/store";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import searchlist from "@/../data/searchlist.json";
-import { Trophy, TrendingUp, TrendingDown, BookOpen } from "lucide-react";
+import { Trophy, TrendingUp, TrendingDown, BookOpen, PlayIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 
 type KanjiItem = {
@@ -21,7 +21,21 @@ type KanjiItem = {
 
 export function LearntKanjiContent() {
   const [learntKanji] = useAtom(learntKanjiAtom);
+  const [practiceKanji, setPracticeKanji] = useAtom(practiceKanjiAtom);
   const [filter, setFilter] = useState<"all" | "mastered" | "learning" | "struggling">("all");
+
+  const handleKanjiClick = (kanji: string) => {
+    setPracticeKanji((prev) => {
+      if (prev.includes(kanji)) {
+        return prev.filter((k) => k !== kanji);
+      }
+      return [...prev, kanji];
+    });
+  };
+
+  const clearAllSelections = () => {
+    setPracticeKanji([]);
+  };
 
   const learntKanjiData = useMemo(() => {
     const entries = Object.entries(learntKanji).map(([kanji, score]) => {
@@ -167,49 +181,104 @@ export function LearntKanjiContent() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {learntKanjiData.map(({ kanji, score, data }) => (
-                  <div key={kanji} className="bg-card border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="text-5xl font-bold">{kanji}</div>
-                      <div className="text-right">
-                        <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
-                          {score > 0 ? `+${score}` : score}
+                {learntKanjiData.map(({ kanji, score, data }) => {
+                  const isSelected = practiceKanji.includes(kanji);
+                  return (
+                    <div
+                      key={kanji}
+                      onClick={() => handleKanjiClick(kanji)}
+                      className={`relative bg-card border rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-md"
+                          : "border-border hover:border-primary"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="text-5xl font-bold">{kanji}</div>
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                            {score > 0 ? `+${score}` : score}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {getScoreLabel(score)}
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {getScoreLabel(score)}
+                      </div>
+
+                      {data && (
+                        <div className="mb-3">
+                          <p className="text-sm font-medium mb-1">{data.m}</p>
+                          <p className="text-xs text-muted-foreground">訓: {data.r}</p>
+                        </div>
+                      )}
+
+                      {/* Progress bar */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>-20</span>
+                          <span>0</span>
+                          <span>20</span>
+                        </div>
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all ${getProgressBarColor(score)}`}
+                            style={{
+                              width: `${((score + 20) / 40) * 100}%`,
+                            }}
+                          />
                         </div>
                       </div>
-                    </div>
 
-                    {data && (
-                      <div className="mb-3">
-                        <p className="text-sm font-medium mb-1">{data.m}</p>
-                        <p className="text-xs text-muted-foreground">訓: {data.r}</p>
-                      </div>
-                    )}
-
-                    {/* Progress bar */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>-20</span>
-                        <span>0</span>
-                        <span>20</span>
-                      </div>
-                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all ${getProgressBarColor(score)}`}
-                          style={{
-                            width: `${((score + 20) / 40) * 100}%`,
-                          }}
-                        />
-                      </div>
+                      {/* Selection indicator */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                          <svg
+                            className="h-4 w-4 text-primary-foreground"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </ScrollArea>
+
+        {/* Floating Action Bar */}
+        {practiceKanji.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-50">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">
+                  {practiceKanji.length} kanji selected
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={clearAllSelections}>
+                  <Trash2Icon className="h-4 w-4 mr-1.5" />
+                  Clear
+                </Button>
+                <Link href="/practice">
+                  <Button size="sm" className="gap-2">
+                    <PlayIcon className="h-4 w-4" />
+                    Start Practice
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
