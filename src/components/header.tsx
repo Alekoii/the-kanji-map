@@ -25,7 +25,7 @@ import {
 const navItems = [
   { href: "/vocab", label: "Vocabulary", route: "vocab" },
   { href: "/practice", label: "Practice", route: "practice" },
-  { href: "/learnt", label: "Learnt", route: "learnt" },
+  { href: "/learnt", label: "Progress", route: "learnt" },
   { href: "/associations", label: "Associations", route: "associations" },
   { href: "/about", label: "About", route: "about" },
 ];
