@@ -18,18 +18,62 @@ const About = () => {
         <ScrollArea className="w-full">
           <div className="p-4 max-w-2xl mx-auto mb-8">
             <h1 className="text-3xl font-extrabold tracking-tight mt-4 mb-4">
-              About
+              About Kanji Learn
             </h1>
-            <p className="mb-8">
-              Kanji Learn is a Japanese language learning tool that shows
-              kanji information and decomposition in graph form.
+            <p className="mb-4">
+              Kanji Learn is a comprehensive Japanese language learning tool that helps you master kanji through interactive visualizations, practice quizzes, and detailed character information. The application features multiple learning modes including browsing, practice games, progress tracking, and 3D network visualizations of kanji relationships.
             </p>
+            <p className="mb-8">
+              This project is based on{" "}
+              <a
+                target="_blank"
+                href="https://github.com/gabor-kovacs/the-kanji-map"
+                rel="noreferrer"
+                className="text-primary inline-block hover:underline font-semibold"
+              >
+                "The Kanji Map"
+              </a>
+              {" "}originally created by{" "}
+              <a
+                target="_blank"
+                href="https://drgaborkovacs.com/index_en.html"
+                rel="noreferrer"
+                className="text-primary inline-block hover:underline"
+              >
+                Gabor Kovacs
+              </a>
+              {" "}(©2017-{new Date().getFullYear()}), an innovative tool for visualizing kanji decomposition through interactive graphs.
+            </p>
+
+            <h2 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+              Features
+            </h2>
+            <ul className="list-disc ml-6 mb-8 space-y-2">
+              <li>
+                <strong>Interactive Kanji Browser</strong> - Explore over 2,500 kanji with advanced filtering (JLPT level, stroke count, type)
+              </li>
+              <li>
+                <strong>Practice Mode</strong> - Test your knowledge with multiple-choice quizzes and track your progress
+              </li>
+              <li>
+                <strong>Progress Tracking</strong> - Monitor your learning journey with intelligent scoring system
+              </li>
+              <li>
+                <strong>3D Network Visualization</strong> - See kanji relationships and decomposition in interactive 2D/3D graphs
+              </li>
+              <li>
+                <strong>Detailed Information</strong> - Access meanings, readings, stroke order, examples, and radicals
+              </li>
+              <li>
+                <strong>Export/Import Progress</strong> - Backup and transfer your learning data across devices
+              </li>
+            </ul>
 
             <ProgressManager />
 
-            <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-4">
-              Giving Back
-            </h1>
+            <h2 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+              Support the Project
+            </h2>
             <a
               href="https://www.paypal.com/donate?hosted_button_id=U867B8RRZUN7E"
               target="_blank"
@@ -105,118 +149,153 @@ const About = () => {
               <li>Examples with audio, kunyomi and onyomi</li>
               <li>Radical with kunyomi and meaning</li>
             </ul>
-            <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-4">
-              Credits
-            </h1>
-            <ul className="list-disc ml-6">
+            <h2 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+              Data Sources & Credits
+            </h2>
+            <p className="mb-4">
+              This application uses high-quality open-source data and libraries from the Japanese learning community:
+            </p>
+
+            <h3 className="text-xl font-semibold mt-6 mb-3">Kanji Data & Graphics</h3>
+            <ul className="list-disc ml-6 space-y-2 mb-6">
               <li>
-                Kanji and decomposition is based on{" "}
                 <a
                   href="https://github.com/KanjiVG/kanjivg"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   KanjiVG
                 </a>
-                , released under the Creative Commons Attribution-Share Alike
-                3.0 licence.
+                {" "}- Kanji vector graphics and decomposition data (CC BY-SA 3.0)
               </li>
               <li>
-                Stroke animations are provided by{" "}
                 <a
                   target="_blank"
                   href="https://github.com/parsimonhi/animCJK"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   animCJK
-                </a>{" "}
-                under the Arphic Public License.
+                </a>
+                {" "}- Stroke order animations (Arphic Public License)
               </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold mt-6 mb-3">Dictionary & Linguistic Data</h3>
+            <ul className="list-disc ml-6 space-y-2 mb-6">
               <li>
-                Kanji, examples and radical information is provided by{" "}
                 <a
                   target="_blank"
                   href="https://jisho.org"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
-                  jisho.org
-                </a>{" "}
-                sourcing from multiple open source{" "}
+                  Jisho.org
+                </a>
+                {" "}- Kanji meanings, readings, examples, and radical information. Sources include{" "}
                 <a
                   target="_blank"
                   href="https://jisho.org/about"
                   rel="noreferrer"
                   className="text-primary inline-block hover:underline"
                 >
-                  dictionaries
-                </a>{" "}
-                and{" "}
+                  JMdict, KANJIDIC2, EDICT
+                </a>
+                {" "}and other open-source dictionaries
+              </li>
+              <li>
                 <a
                   target="_blank"
                   href="https://kanjialive.com/"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   Kanji alive
-                </a>{" "}
-                released under CC 4.0.
+                </a>
+                {" "}- Additional kanji information and examples (CC BY 4.0)
               </li>
+            </ul>
+
+            <h3 className="text-xl font-semibold mt-6 mb-3">Technical Libraries</h3>
+            <ul className="list-disc ml-6 space-y-2 mb-6">
               <li>
-                Graph is created by{" "}
                 <a
                   target="_blank"
                   href="https://github.com/vasturiano/react-force-graph"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   react-force-graph
-                </a>{" "}
-                and{" "}
+                </a>
+                {" "}- Force-directed graph visualizations (MIT License)
+              </li>
+              <li>
                 <a
                   target="_blank"
                   href="https://github.com/vasturiano/three-spritetext"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   three-spritetext
-                </a>{" "}
-                released under MIT.
+                </a>
+                {" "}- 3D text rendering for graphs (MIT License)
               </li>
               <li>
-                Hand written kanji recognition uses{" "}
                 <a
                   target="_blank"
                   href="https://github.com/ChenYuHo/handwriting.js"
                   rel="noreferrer"
-                  className="text-primary inline-block hover:underline"
+                  className="text-primary inline-block hover:underline font-semibold"
                 >
                   handwriting.js
-                </a>{" "}
-                released under MIT.
+                </a>
+                {" "}- Handwritten kanji recognition (MIT License)
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  href="https://ui.shadcn.com/"
+                  rel="noreferrer"
+                  className="text-primary inline-block hover:underline font-semibold"
+                >
+                  shadcn/ui
+                </a>
+                {" "}- Beautiful and accessible UI components (MIT License)
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  href="https://nextjs.org/"
+                  rel="noreferrer"
+                  className="text-primary inline-block hover:underline font-semibold"
+                >
+                  Next.js
+                </a>
+                {" "}- React framework for production (MIT License)
               </li>
             </ul>
-            <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-4">
-              Github repository
-            </h1>
-            <p>
-              The source code can be found at{" "}
+
+            <h2 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+              Source Code
+            </h2>
+            <p className="mb-4">
+              The original project source code:{" "}
               <a
                 target="_blank"
                 href="https://github.com/gabor-kovacs/the-kanji-map"
                 rel="noreferrer"
-                className="text-primary inline-block hover:underline"
+                className="text-primary inline-block hover:underline font-semibold"
               >
                 github.com/gabor-kovacs/the-kanji-map
               </a>
             </p>
-            <h1 className="text-3xl font-extrabold tracking-tight mt-8 mb-8">
-              Copyright
-            </h1>
-            <p>
-              ©Kanji Learn 2017-{new Date().getFullYear()} by{" "}
+
+            <h2 className="text-2xl font-bold tracking-tight mt-8 mb-4">
+              License & Copyright
+            </h2>
+            <p className="mb-4">
+              Original "The Kanji Map" ©2017-{new Date().getFullYear()}{" "}
               <a
                 target="_blank"
                 href="https://drgaborkovacs.com/index_en.html"
@@ -224,8 +303,22 @@ const About = () => {
                 className="text-primary inline-block hover:underline"
               >
                 Gabor Kovacs
-              </a>{" "}
-              - released under the MIT license.
+              </a>
+            </p>
+            <p className="mb-4">
+              Released under the{" "}
+              <a
+                target="_blank"
+                href="https://opensource.org/licenses/MIT"
+                rel="noreferrer"
+                className="text-primary inline-block hover:underline"
+              >
+                MIT License
+              </a>
+              . You are free to use, modify, and distribute this software in accordance with the license terms.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              All third-party data sources and libraries retain their respective licenses and copyrights as listed above.
             </p>
           </div>
         </ScrollArea>
