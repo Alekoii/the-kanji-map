@@ -1,16 +1,11 @@
 "use client";
 
-import { InfoIcon, ListIcon, PuzzleIcon, Gamepad2Icon, TrophyIcon, NetworkIcon, MenuIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { buttonVariants, Button } from "./ui/button";
+import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcherButton } from "./theme-switcher";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Sheet,
   SheetContent,
@@ -19,14 +14,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 const navItems = [
-  { href: "/list", label: "Kanji List", icon: ListIcon, route: "list" },
-  { href: "/radicals", label: "Radicals", icon: PuzzleIcon, route: "radicals" },
-  { href: "/practice", label: "Practice Game", icon: Gamepad2Icon, route: "practice" },
-  { href: "/learnt", label: "Learnt Kanji", icon: TrophyIcon, route: "learnt" },
-  { href: "/associations", label: "3D Associations Network", icon: NetworkIcon, route: "associations" },
-  { href: "/about", label: "About", icon: InfoIcon, route: "about" },
+  { href: "/list", label: "Kanji List", route: "list" },
+  { href: "/radicals", label: "Radicals", route: "radicals" },
+  { href: "/practice", label: "Practice", route: "practice" },
+  { href: "/learnt", label: "Learnt", route: "learnt" },
+  { href: "/associations", label: "Associations", route: "associations" },
+  { href: "/about", label: "About", route: "about" },
 ];
 
 export const Header = ({
@@ -43,9 +45,9 @@ export const Header = ({
         className,
       )}
     >
-      <div className="container flex h-14 md:h-16 items-center justify-between px-4">
+      <div className="flex h-14 md:h-16 items-center justify-between px-4">
         {/* Logo Section */}
-        <div className="flex items-center">
+        <div className="flex items-center min-w-[200px]">
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="/logo.svg"
@@ -54,50 +56,43 @@ export const Header = ({
               height={40}
               className="w-8 h-8 md:w-10 md:h-10"
             />
-            <h1 className="text-base md:text-lg font-extrabold hidden xs:block">
+            <h1 className="text-base md:text-lg font-extrabold hidden sm:block">
               Kanji Learn
             </h1>
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navItems.map((item) => (
-            <Tooltip key={item.route}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={route === item.route ? "/" : item.href}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    route === item.route && "bg-accent text-accent-foreground",
-                  )}
-                >
-                  <item.icon className="size-5" />
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{item.label}</p>
-              </TooltipContent>
-            </Tooltip>
-          ))}
-
-          <div className="ml-2 border-l pl-2 flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ThemeSwitcherButton />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Change theme</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Button asChild variant="default" size="sm" className="ml-1">
-              <a href="https://asakiri.com" target="_blank" rel="noopener noreferrer">
-                Check out Asakiri
-              </a>
-            </Button>
-          </div>
+        {/* Desktop Navigation - Centered */}
+        <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {navItems.map((item) => (
+                <NavigationMenuItem key={item.route}>
+                  <Link href={route === item.route ? "/" : item.href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        route === item.route && "bg-accent text-accent-foreground",
+                      )}
+                    >
+                      {item.label}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
         </nav>
+
+        {/* Desktop Right Section */}
+        <div className="hidden lg:flex items-center gap-2 min-w-[200px] justify-end">
+          <ThemeSwitcherButton />
+          <Button asChild variant="default" size="sm">
+            <a href="https://asakiri.com" target="_blank" rel="noopener noreferrer">
+              Check out Asakiri
+            </a>
+          </Button>
+        </div>
 
         {/* Mobile Navigation */}
         <div className="flex lg:hidden items-center gap-2">
@@ -105,7 +100,7 @@ export const Header = ({
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon">
                 <MenuIcon className="size-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -119,18 +114,16 @@ export const Header = ({
               </SheetHeader>
               <nav className="flex flex-col gap-2 mt-6">
                 {navItems.map((item) => (
-                  <Link
+                  <Button
                     key={item.route}
-                    href={route === item.route ? "/" : item.href}
-                    className={cn(
-                      buttonVariants({ variant: "ghost" }),
-                      "justify-start gap-3 h-12",
-                      route === item.route && "bg-accent text-accent-foreground",
-                    )}
+                    asChild
+                    variant={route === item.route ? "secondary" : "ghost"}
+                    className="justify-start"
                   >
-                    <item.icon className="size-5" />
-                    <span>{item.label}</span>
-                  </Link>
+                    <Link href={route === item.route ? "/" : item.href}>
+                      {item.label}
+                    </Link>
+                  </Button>
                 ))}
 
                 <div className="mt-4 pt-4 border-t">
