@@ -19,6 +19,7 @@ interface Props {
   autoRotate: boolean;
   showParticles: boolean;
   joyoOnly: boolean;
+  searchKanji?: string;
 }
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,7 @@ const CompleteGraph3D = ({
   autoRotate,
   showParticles,
   joyoOnly,
+  searchKanji,
 }: Props) => {
   // Memoize lists to prevent recreation on every render
   const joyoList = React.useMemo(
@@ -46,6 +48,9 @@ const CompleteGraph3D = ({
   const router = useRouter();
 
   const [data, setData] = React.useState<GraphData | null>(graphData);
+  const [selectedNode, setSelectedNode] = React.useState<NodeObject | null>(null);
+  const [highlightNodes, setHighlightNodes] = React.useState<Set<string>>(new Set());
+  const [highlightLinks, setHighlightLinks] = React.useState<Set<any>>(new Set());
 
   // Cleanup on unmount
   React.useEffect(() => {
@@ -90,7 +95,49 @@ const CompleteGraph3D = ({
   }, [graphData, joyoOnly, joyoList]);
 
   const handleClick = (node: NodeObject) => {
-    void router.push(`/${node?.id}`);
+    // Highlight the node and its first-level associations instead of navigating
+    if (!node || !data) return;
+
+    const nodeId = String(node.id);
+
+    // Find all connected nodes (first level)
+    const connectedNodes = new Set<string>();
+    const connectedLinks = new Set();
+
+    data.links.forEach((link: any) => {
+      const sourceId = typeof link.source === "object" ? link.source.id : link.source;
+      const targetId = typeof link.target === "object" ? link.target.id : link.target;
+
+      if (String(sourceId) === nodeId) {
+        connectedNodes.add(String(targetId));
+        connectedLinks.add(link);
+      } else if (String(targetId) === nodeId) {
+        connectedNodes.add(String(sourceId));
+        connectedLinks.add(link);
+      }
+    });
+
+    // Add the clicked node itself
+    connectedNodes.add(nodeId);
+
+    setSelectedNode(node);
+    setHighlightNodes(connectedNodes);
+    setHighlightLinks(connectedLinks);
+
+    // Focus camera on the selected node
+    const distance = 200;
+    if (node.x && node.y && node.z && fg3DRef?.current) {
+      const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+      fg3DRef.current.cameraPosition(
+        {
+          x: node.x * distRatio,
+          y: node.y * distRatio,
+          z: node.z * distRatio,
+        },
+        { x: node.x, y: node.y, z: node.z },
+        1000,
+      );
+    }
   };
 
   // Prefetch routes for performance
@@ -103,6 +150,22 @@ const CompleteGraph3D = ({
       void router.prefetch(`/${node.id}`);
     });
   }, [data, router]);
+
+  // Handle search - zoom to kanji when searched
+  React.useEffect(() => {
+    if (!searchKanji || !data?.nodes) return;
+
+    const searchTimeout = setTimeout(() => {
+      const foundNode = data.nodes.find((node) => String(node.id) === searchKanji) as NodeObject;
+
+      if (foundNode) {
+        // Simulate click to highlight associations
+        handleClick(foundNode);
+      }
+    }, 100);
+
+    return () => clearTimeout(searchTimeout);
+  }, [searchKanji, data]);
 
   // Handle auto-rotation
   React.useEffect(() => {
@@ -203,10 +266,16 @@ const CompleteGraph3D = ({
       height={bounds.height}
       backgroundColor={"#00000000"}
       graphData={data}
-      linkColor={() => {
-        return resolvedTheme === "dark" ? "#ffffff50" : "#00000030";
+      linkColor={(link: any) => {
+        const isHighlighted = highlightLinks.has(link);
+        if (isHighlighted) {
+          return resolvedTheme === "dark" ? "#ff0080" : "#ff0080"; // Pink/magenta for highlighted
+        }
+        return resolvedTheme === "dark" ? "#ffffff30" : "#00000020";
       }}
-      linkOpacity={0.3}
+      linkWidth={(link: any) => {
+        return highlightLinks.has(link) ? 3 : 1;
+      }}
       linkDirectionalArrowLength={3}
       linkDirectionalArrowRelPos={0.8}
       linkDirectionalArrowResolution={6}
@@ -233,15 +302,32 @@ const CompleteGraph3D = ({
                `;
       }}
       nodeThreeObject={(node: NodeObject) => {
-        const color = getNodeDefaultColor(node.id as string);
+        const nodeId = String(node.id);
+        const isHighlighted = highlightNodes.has(nodeId);
+        const isSelected = selectedNode?.id === node.id;
+
+        let color = getNodeDefaultColor(nodeId);
+        let size = 5;
+        let textHeight = 6;
+
+        // Highlight selected node
+        if (isSelected) {
+          color = "#ff0080"; // Magenta for selected
+          size = 8;
+          textHeight = 9;
+        } else if (isHighlighted) {
+          // Highlighted connected nodes
+          size = 7;
+          textHeight = 7.5;
+        }
 
         const ball = new THREE.Mesh(
-          new THREE.SphereGeometry(5, 16, 16),
+          new THREE.SphereGeometry(size, 16, 16),
           new THREE.MeshLambertMaterial({
             color: color,
             transparent: true,
             depthWrite: false,
-            opacity: 0.95,
+            opacity: isHighlighted || isSelected ? 1.0 : 0.95,
           }),
         );
 
@@ -249,7 +335,7 @@ const CompleteGraph3D = ({
         sprite.fontFace =
           "Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times, Source Serif Pro, serif";
         sprite.color = "#000";
-        sprite.textHeight = 6;
+        sprite.textHeight = textHeight;
         sprite.fontSize = 80;
         sprite.padding = 2;
 

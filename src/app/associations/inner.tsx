@@ -17,8 +17,8 @@ import {
   RefreshCcwIcon,
   ArrowUpFromDotIcon,
   MaximizeIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
+  SearchIcon,
+  XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GraphData } from "react-force-graph-3d";
@@ -41,6 +41,8 @@ export function AssociationsContent({ graphData }: Props) {
   const [particles, setParticles] = useAtom(particlesAtom);
   const [joyoOnly, setJoyoOnly] = useAtom(joyoOnlyAtom);
   const [random, setRandom] = React.useState<number>(Date.now());
+  const [searchValue, setSearchValue] = React.useState("");
+  const [searchKanji, setSearchKanji] = React.useState<string>("");
 
   const handleRotateChange = (value: boolean) => {
     setRotate(value);
@@ -56,6 +58,18 @@ export function AssociationsContent({ graphData }: Props) {
 
   const handleZoomToFit = () => {
     setRandom(Date.now());
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      setSearchKanji(searchValue.trim());
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchValue("");
+    setSearchKanji("");
   };
 
   return (
@@ -88,8 +102,40 @@ export function AssociationsContent({ graphData }: Props) {
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="absolute top-4 right-4 left-4 md:left-auto md:right-4 z-50 md:w-80">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search kanji (e.g., 会, 漢, 学)"
+              className="w-full h-10 px-4 pr-10 rounded-lg border bg-background/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-accent rounded"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          <Button type="submit" size="icon" className="h-10 w-10">
+            <SearchIcon className="h-4 w-4" />
+          </Button>
+        </form>
+        {searchKanji && (
+          <div className="mt-2 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm px-3 py-1 rounded">
+            Viewing: <span className="font-bold text-primary">{searchKanji}</span> and its associations
+          </div>
+        )}
+      </div>
+
       {/* Controls */}
-      <div className="absolute top-0 right-0 p-4 flex gap-1">
+      <div className="absolute bottom-4 right-4 p-4 bg-background/80 backdrop-blur-sm rounded-lg border flex gap-1">
         <div>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -176,6 +222,7 @@ export function AssociationsContent({ graphData }: Props) {
           joyoOnly={joyoOnly}
           triggerFocus={random}
           bounds={bounds}
+          searchKanji={searchKanji}
         />
       </div>
     </div>
