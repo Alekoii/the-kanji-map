@@ -350,7 +350,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
         )}
         {practiceKanji.length > 0 && (
           <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-            <div className="bg-primary text-primary-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4">
+            <div className="bg-card text-card-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4 border">
               <span className="font-semibold">
                 {practiceKanji.length} kanji selected
               </span>
@@ -490,7 +490,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
       )}
       {practiceKanji.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-          <div className="bg-primary text-primary-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4">
+          <div className="bg-card text-card-foreground rounded-full shadow-lg px-6 py-3 flex items-center gap-4 border">
             <span className="font-semibold">
               {practiceKanji.length} kanji selected
             </span>
