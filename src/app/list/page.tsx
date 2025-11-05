@@ -4,7 +4,8 @@ import { Header } from "@/components/header";
 import { KanjiListContent } from "./inner";
 
 export const metadata: Metadata = {
-    title: "Kanji List",
+    title: "Complete Kanji List - Browse All Japanese Characters",
+    description: "Browse the complete list of Japanese kanji characters with meanings, readings, and stroke counts. Find kanji by JLPT level, frequency, or joyo/jinmeiyo classification. Perfect for organized kanji study and review.",
 };
 
 export default function KanjiListPage(props: any) {

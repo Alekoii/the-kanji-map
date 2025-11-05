@@ -4,8 +4,8 @@ import { AssociationsContent } from "./inner";
 import { Header } from "@/components/header";
 
 export const metadata: Metadata = {
-  title: "Kanji Associations - 3D Network View",
-  description: "Explore all kanji associations and relationships in an interactive 3D network visualization",
+  title: "Kanji Associations - Interactive 3D Network Visualization",
+  description: "Explore all Japanese kanji associations and relationships in an interactive 3D network. Discover how kanji connect through shared components, radicals, and readings. Visual learning tool for understanding kanji structure and relationships.",
 };
 
 export default async function AssociationsPage() {

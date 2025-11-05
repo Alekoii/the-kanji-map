@@ -11,8 +11,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id: urlEncodedId } = await params;
   const id = decodeURIComponent(urlEncodedId);
+  const kanjiInfo = await getKanjiDataLocal(id);
+
+  const meaning = kanjiInfo?.jishoData?.meaning || "";
+  const kunyomi = kanjiInfo?.jishoData?.kunyomi || "";
+  const onyomi = kanjiInfo?.jishoData?.onyomi?.join(", ") || "";
+
   return {
-    title: id,
+    title: `${id} - ${meaning ? meaning.split(", ").slice(0, 3).join(", ") : "Japanese Kanji"}`,
+    description: `Learn the Japanese kanji ${id}. ${meaning ? `Meaning: ${meaning}. ` : ""}${kunyomi ? `Kunyomi: ${kunyomi}. ` : ""}${onyomi ? `Onyomi: ${onyomi}. ` : ""}Study stroke order, decomposition, examples, and kanji associations with interactive visualizations.`,
   };
 }
 

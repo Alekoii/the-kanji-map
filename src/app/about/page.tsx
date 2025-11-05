@@ -5,7 +5,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About Kanji Learn - Interactive Japanese Kanji Learning Tool",
+  description: "Learn about Kanji Learn, a comprehensive Japanese kanji learning tool featuring interactive 3D visualizations, decomposition graphs, and JLPT study resources. Discover how to master Japanese characters effectively.",
 };
 
 const About = () => {

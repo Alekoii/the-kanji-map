@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Kanji Learn",
+    "name": "Kanji Learn - Master Japanese Kanji",
     "short_name": "KanjiLearn",
-    "description": "Kanji Learn is a Japanese language learning tool that shows kanji information and decomposition in graph form.",
+    "description": "Learn Japanese kanji with interactive 3D visualizations, stroke animations, and practice quizzes. Master 2000+ kanji with visual learning tools for JLPT and Japanese language study.",
     "icons": [
         {
             "src": "/icon-192x192.png",
