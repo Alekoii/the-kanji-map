@@ -158,87 +158,93 @@ export function PracticeGameContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header route="practice" />
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl space-y-8">
-          {/* Progress bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </span>
-              <span>
-                Score: {score} / {currentQuestionIndex + (showResult ? 1 : 0)}
-              </span>
+
+      {/* Scrollable content area */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="min-h-full flex items-center justify-center p-4 pb-24">
+          <div className="w-full max-w-2xl space-y-8">
+            {/* Progress bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </span>
+                <span>
+                  Score: {score} / {currentQuestionIndex + (showResult ? 1 : 0)}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{
+                    width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary transition-all duration-300"
-                style={{
-                  width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`,
-                }}
-              />
+
+            {/* Question */}
+            <div className="text-center space-y-4">
+              <h2 className="text-xl font-semibold text-muted-foreground">
+                What is the meaning of this kanji?
+              </h2>
+              <div className="text-9xl font-bold py-8">{currentQuestion.kanji}</div>
             </div>
-          </div>
 
-          {/* Question */}
-          <div className="text-center space-y-4">
-            <h2 className="text-xl font-semibold text-muted-foreground">
-              What is the meaning of this kanji?
-            </h2>
-            <div className="text-9xl font-bold py-8">{currentQuestion.kanji}</div>
-          </div>
+            {/* Answer options */}
+            <div className="space-y-3">
+              {currentQuestion.options.map((option, index) => {
+                const isCorrect = option === currentQuestion.correctAnswer;
+                const isSelected = option === selectedAnswer;
+                const shouldShowCorrect = showResult && isCorrect;
+                const shouldShowWrong = showResult && isSelected && !isCorrect;
 
-          {/* Answer options */}
-          <div className="space-y-3">
-            {currentQuestion.options.map((option, index) => {
-              const isCorrect = option === currentQuestion.correctAnswer;
-              const isSelected = option === selectedAnswer;
-              const shouldShowCorrect = showResult && isCorrect;
-              const shouldShowWrong = showResult && isSelected && !isCorrect;
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => handleAnswerSelect(option)}
-                  disabled={showResult}
-                  className={cn(
-                    "w-full p-4 text-left rounded-lg border-2 transition-all",
-                    "hover:border-primary hover:bg-accent",
-                    "disabled:cursor-not-allowed",
-                    !showResult && "active:scale-[0.98]",
-                    shouldShowCorrect &&
-                      "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
-                    shouldShowWrong &&
-                      "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400",
-                    !showResult && isSelected && "border-primary bg-accent"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg">{option}</span>
-                    {shouldShowCorrect && (
-                      <CheckCircle2Icon className="h-6 w-6 text-green-600" />
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswerSelect(option)}
+                    disabled={showResult}
+                    className={cn(
+                      "w-full p-4 text-left rounded-lg border-2 transition-all",
+                      "hover:border-primary hover:bg-accent",
+                      "disabled:cursor-not-allowed",
+                      !showResult && "active:scale-[0.98]",
+                      shouldShowCorrect &&
+                        "border-green-500 bg-green-500/10 text-green-700 dark:text-green-400",
+                      shouldShowWrong &&
+                        "border-red-500 bg-red-500/10 text-red-700 dark:text-red-400",
+                      !showResult && isSelected && "border-primary bg-accent"
                     )}
-                    {shouldShowWrong && (
-                      <XCircleIcon className="h-6 w-6 text-red-600" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Next button */}
-          {showResult && (
-            <div className="flex justify-center pt-4">
-              <Button onClick={handleNext} size="lg">
-                {currentQuestionIndex < questions.length - 1
-                  ? "Next Question"
-                  : "See Results"}
-              </Button>
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg">{option}</span>
+                      {shouldShowCorrect && (
+                        <CheckCircle2Icon className="h-6 w-6 text-green-600" />
+                      )}
+                      {shouldShowWrong && (
+                        <XCircleIcon className="h-6 w-6 text-red-600" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          </div>
         </div>
       </div>
+
+      {/* Sticky footer with Next button */}
+      {showResult && (
+        <div className="sticky bottom-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container max-w-2xl mx-auto p-4">
+            <Button onClick={handleNext} size="lg" className="w-full">
+              {currentQuestionIndex < questions.length - 1
+                ? "Next Question"
+                : "See Results"}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
