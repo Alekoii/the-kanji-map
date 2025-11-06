@@ -82,6 +82,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          themes={["light", "dark", "warm", "warm-dark", "system"]}
         >
           <TooltipProvider>
             <JotaiProvider>

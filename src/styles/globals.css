@@ -79,6 +79,13 @@
   body {
     color: oklch(var(--foreground));
     background: oklch(var(--background));
+    font-family: var(--font-english, 'Inter', sans-serif);
+  }
+
+  /* Apply Japanese font to elements with Japanese text */
+  [lang="ja"],
+  .japanese-text {
+    font-family: var(--font-japanese, 'Noto Sans JP', sans-serif);
   }
 }
 
@@ -267,7 +274,7 @@
     --spacing: 0.25rem;
   }
 
-  .warm.dark {
+  .warm-dark {
     --background: 0.1797 0.0043 308.1928;
     --foreground: 0.8109 0 0;
     --card: 0.1822 0 0;

@@ -95,14 +95,40 @@ export default function SettingsPage() {
     localStorage.setItem("english-font", englishFont);
   }, [japaneseFont, englishFont, mounted]);
 
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Handle system mode with warm theme - listen for system preference changes
+    if (mode === "system" && colorTheme === "warm") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+      const updateTheme = () => {
+        setTheme(mediaQuery.matches ? "warm-dark" : "warm");
+      };
+
+      updateTheme();
+      mediaQuery.addEventListener("change", updateTheme);
+
+      return () => mediaQuery.removeEventListener("change", updateTheme);
+    }
+  }, [mode, colorTheme, mounted, setTheme]);
+
   const applyTheme = (newMode: string, newColorTheme: string) => {
     if (newMode === "system") {
-      const systemMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      const finalTheme = newColorTheme === "default" ? systemMode : newColorTheme;
-      setTheme(finalTheme);
+      if (newColorTheme === "default") {
+        setTheme("system");
+      } else {
+        // For warm theme with system mode, set based on current system preference
+        const systemMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        setTheme(systemMode === "dark" ? "warm-dark" : "warm");
+      }
     } else {
-      const finalTheme = newColorTheme === "default" ? newMode : newColorTheme;
-      setTheme(finalTheme);
+      // Direct mode selection
+      if (newColorTheme === "default") {
+        setTheme(newMode);
+      } else {
+        setTheme(newMode === "dark" ? "warm-dark" : "warm");
+      }
     }
   };
 
