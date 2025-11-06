@@ -138,6 +138,23 @@ export function VocabCard({
         </div>
       </div>
 
+      {/* Kanji breakdown preview with color coding */}
+      {kanjiBreakdown.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-2">
+          {kanjiBreakdown.map((item, index) => {
+            const kanjiScore = learntKanji[item.kanji];
+            return (
+              <span
+                key={index}
+                className={`text-lg font-bold px-1.5 py-0.5 rounded border-2 transition-colors ${getKanjiBackgroundColor(kanjiScore)} ${getKanjiBorderColor(kanjiScore)}`}
+              >
+                {item.kanji}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
       <div className="mt-auto space-y-1 text-sm text-muted-foreground">
         {/* Reading */}
         <p className="text-xs font-medium text-foreground">
