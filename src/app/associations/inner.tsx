@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { ResizeObserver } from "@juggle/resize-observer";
 import useMeasure from "react-use-measure";
@@ -19,6 +20,7 @@ import {
   MaximizeIcon,
   SearchIcon,
   XIcon,
+  MonitorIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GraphData } from "react-force-graph-3d";
@@ -33,6 +35,37 @@ interface Props {
 }
 
 export function AssociationsContent({ graphData }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] p-6">
+        <div className="max-w-md text-center space-y-4">
+          <div className="flex justify-center">
+            <MonitorIcon className="h-24 w-24 text-muted-foreground" />
+          </div>
+          <h2 className="text-2xl font-bold">Desktop Only</h2>
+          <p className="text-muted-foreground">
+            The Associations page features an interactive 3D visualization that requires a larger screen for the best experience.
+          </p>
+          <p className="text-muted-foreground">
+            Please open this page on a desktop or laptop computer to explore the kanji associations network.
+          </p>
+        </div>
+      </div>
+    );
+  }
   const [measureRef, bounds] = useMeasure({
     polyfill: ResizeObserver,
   });
