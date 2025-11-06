@@ -68,6 +68,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={notoSansJp.className}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Serif+JP:wght@200..900&family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@300;400;500;700;900&family=Kosugi+Maru&family=Sawarabi+Gothic&family=Sawarabi+Mincho&family=Shippori+Mincho:wght@400;500;600;700;800&family=Klee+One:wght@400;600&family=Yusei+Magic&family=Dela+Gothic+One&family=Reggae+One&family=Hachi+Maru+Pop&family=RocknRoll+One&family=Inter:wght@100..900&family=Roboto:wght@100;300;400;500;700;900&family=Open+Sans:wght@300..800&family=Lato:wght@100;300;400;700;900&family=Montserrat:wght@100..900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:wght@200..900&family=Raleway:wght@100..900&family=Nunito:wght@200..1000&family=Ubuntu:wght@300;400;500;700&family=Playfair+Display:wght@400..900&family=Merriweather:wght@300;400;700;900&family=Lora:wght@400..700&family=PT+Serif:wght@400;700&family=Crimson+Text:wght@400;600;700&family=Fira+Sans:wght@100;200;300;400;500;600;700;800;900&family=Work+Sans:wght@100..900&family=DM+Sans:wght@100..1000&family=Space+Grotesk:wght@300..700&family=Manrope:wght@200..800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="w-screen h-screen overflow-hidden bg-background text-foreground selection:bg-primary">
         <ThemeProvider
           attribute="class"
