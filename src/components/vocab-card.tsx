@@ -1,5 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import { getVocabKanjiBreakdown } from "@/lib/kanji-breakdown";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 interface VocabCardProps {
   expression: string;
   reading: string;
@@ -19,6 +23,8 @@ export function VocabCard({
   isSelected = false,
   learningScore,
 }: VocabCardProps) {
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const kanjiBreakdown = getVocabKanjiBreakdown(expression);
   const getLearningBadgeColor = (score: number) => {
     if (score >= 20) return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
     if (score >= 10) return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
@@ -43,6 +49,11 @@ export function VocabCard({
   // Get primary tag (JLPT level or source)
   const primaryTag = tags.find((tag) => tag.includes("JLPT")) || tags[0];
 
+  const handleBreakdownToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowBreakdown(!showBreakdown);
+  };
+
   return (
     <div
       onClick={onClick}
@@ -62,6 +73,15 @@ export function VocabCard({
               {primaryTag.replace(/_/g, " ")}
             </span>
           )}
+          {kanjiBreakdown.length > 0 && (
+            <button
+              onClick={handleBreakdownToggle}
+              className="text-xs px-2 py-1 rounded-full bg-slate-500/10 text-slate-600 dark:text-slate-400 hover:bg-slate-500/20 transition-colors flex items-center gap-1"
+            >
+              {showBreakdown ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              Kanji
+            </button>
+          )}
         </div>
       </div>
 
@@ -75,6 +95,38 @@ export function VocabCard({
           {meaning}
         </p>
       </div>
+
+      {/* Kanji Breakdown */}
+      {showBreakdown && kanjiBreakdown.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-border space-y-2">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+            Kanji Breakdown
+          </p>
+          <div className="grid grid-cols-1 gap-2">
+            {kanjiBreakdown.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-2 text-xs p-2 rounded-md bg-muted/50"
+              >
+                <span className="text-2xl font-bold shrink-0">{item.kanji}</span>
+                <div className="flex-1 min-w-0">
+                  {item.reading && (
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {item.reading}
+                    </p>
+                  )}
+                  <p className="text-[11px] line-clamp-2">{item.meaning}</p>
+                  {item.jlptLevel && (
+                    <span className="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      {item.jlptLevel}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Learning Progress Indicator */}
       {learningScore !== undefined && (
