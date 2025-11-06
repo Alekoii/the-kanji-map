@@ -222,7 +222,7 @@ export function PracticeGameContent() {
   // Show message only if no kanji selected AND no learning kanji available
   if (practiceKanjiData.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <Header route="practice" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4 max-w-md">
@@ -248,7 +248,7 @@ export function PracticeGameContent() {
     const percentage = Math.round((score / questions.length) * 100);
 
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <Header route="practice" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-6 max-w-md">
@@ -280,7 +280,7 @@ export function PracticeGameContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Header route="practice" />
 
       {/* Auto-selected banner */}

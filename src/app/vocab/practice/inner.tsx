@@ -137,7 +137,7 @@ export function VocabPracticeGameContent() {
   // Show message only if no vocab selected AND no learning vocab available
   if (practiceVocabData.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <Header route="vocab" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-4 max-w-md">
@@ -163,7 +163,7 @@ export function VocabPracticeGameContent() {
     const percentage = Math.round((score / questions.length) * 100);
 
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <Header route="vocab" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center space-y-6 max-w-md">
@@ -195,7 +195,7 @@ export function VocabPracticeGameContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <Header route="vocab" />
 
       {/* Auto-selected banner */}
