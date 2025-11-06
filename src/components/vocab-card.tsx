@@ -1,5 +1,7 @@
 "use client";
 
+import { useAtom } from "jotai";
+import { learntKanjiAtom } from "@/lib/store";
 import { getVocabKanjiBreakdown } from "@/lib/kanji-breakdown";
 import { BookOpen } from "lucide-react";
 import {
@@ -29,7 +31,24 @@ export function VocabCard({
   isSelected = false,
   learningScore,
 }: VocabCardProps) {
+  const [learntKanji] = useAtom(learntKanjiAtom);
   const kanjiBreakdown = getVocabKanjiBreakdown(expression);
+
+  const getKanjiBorderColor = (score: number | undefined) => {
+    if (score === undefined) return "border-border";
+    if (score >= 20) return "border-green-500";
+    if (score >= 10) return "border-blue-500";
+    if (score > 0) return "border-yellow-500";
+    return "border-red-500";
+  };
+
+  const getKanjiBackgroundColor = (score: number | undefined) => {
+    if (score === undefined) return "bg-muted/50";
+    if (score >= 20) return "bg-green-500/10";
+    if (score >= 10) return "bg-blue-500/10";
+    if (score > 0) return "bg-yellow-500/10";
+    return "bg-red-500/10";
+  };
 
   const getLearningBadgeColor = (score: number) => {
     if (score >= 20) return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
@@ -93,22 +112,25 @@ export function VocabCard({
                   </DialogTitle>
                 </DialogHeader>
                 <div className="grid grid-cols-1 gap-3 mt-4">
-                  {kanjiBreakdown.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border"
-                    >
-                      <span className="text-4xl font-bold shrink-0">{item.kanji}</span>
-                      <div className="flex-1 min-w-0 space-y-1">
-                        {item.reading && (
-                          <p className="text-sm text-muted-foreground">
-                            {item.reading}
-                          </p>
-                        )}
-                        <p className="text-sm font-medium">{item.meaning}</p>
+                  {kanjiBreakdown.map((item, index) => {
+                    const kanjiScore = learntKanji[item.kanji];
+                    return (
+                      <div
+                        key={index}
+                        className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-colors ${getKanjiBackgroundColor(kanjiScore)} ${getKanjiBorderColor(kanjiScore)}`}
+                      >
+                        <span className="text-4xl font-bold shrink-0">{item.kanji}</span>
+                        <div className="flex-1 min-w-0 space-y-1">
+                          {item.reading && (
+                            <p className="text-sm text-muted-foreground">
+                              {item.reading}
+                            </p>
+                          )}
+                          <p className="text-sm font-medium">{item.meaning}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </DialogContent>
             </Dialog>
