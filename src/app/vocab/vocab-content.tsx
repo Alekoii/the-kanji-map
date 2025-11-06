@@ -26,6 +26,17 @@ interface VocabContentProps {
 export const practiceVocabAtom = atomWithStorage<string[]>("practice-vocab", []);
 export const learntVocabAtom = atomWithStorage<Record<string, number>>("learnt-vocab", {});
 
+// Tag groups that should be treated as equivalent
+const TAG_GROUPS: Record<string, string[]> = {
+  "JLPT N5": ["JLPT_5", "JLPT_N5"],
+  "JLPT N4": ["JLPT_4", "JLPT_N4"],
+  "JLPT N3": ["JLPT_3", "JLPT_N3"],
+  "JLPT N2": ["JLPT_2", "JLPT_N2"],
+  "JLPT N1": ["JLPT_1", "JLPT_N1"],
+  "Genki": ["Genki"],
+  "Intermediate Japanese": ["Intermediate_Japanese"],
+};
+
 export function VocabContent({ isMobile = false }: VocabContentProps) {
   const [filters, setFilters] = useState<VocabFilters>({
     search: "",
@@ -114,7 +125,9 @@ export function VocabContent({ isMobile = false }: VocabContentProps) {
 
       // Tag filter
       if (filters.tags.length > 0) {
-        const hasMatchingTag = filters.tags.some((tag) => item.tags.includes(tag));
+        // Expand tag groups to include all equivalent tags
+        const expandedTags = filters.tags.flatMap((tag) => TAG_GROUPS[tag] || [tag]);
+        const hasMatchingTag = expandedTags.some((tag) => item.tags.includes(tag));
         if (!hasMatchingTag) {
           return false;
         }

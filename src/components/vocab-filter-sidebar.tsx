@@ -25,21 +25,18 @@ interface VocabFilterProps {
 
 const STORAGE_KEY = "vocab-learn-filters";
 
-// Common JLPT and source tags
-const COMMON_TAGS = [
-  "JLPT_1",
-  "JLPT_2",
-  "JLPT_3",
-  "JLPT_4",
-  "JLPT_5",
-  "JLPT_N1",
-  "JLPT_N2",
-  "JLPT_N3",
-  "JLPT_N4",
-  "JLPT_N5",
-  "Genki",
-  "Intermediate_Japanese",
-];
+// Tag groups that should be treated as equivalent
+const TAG_GROUPS: Record<string, string[]> = {
+  "JLPT N5": ["JLPT_5", "JLPT_N5"],
+  "JLPT N4": ["JLPT_4", "JLPT_N4"],
+  "JLPT N3": ["JLPT_3", "JLPT_N3"],
+  "JLPT N2": ["JLPT_2", "JLPT_N2"],
+  "JLPT N1": ["JLPT_1", "JLPT_N1"],
+  "Genki": ["Genki"],
+  "Intermediate Japanese": ["Intermediate_Japanese"],
+};
+
+const COMMON_TAGS = Object.keys(TAG_GROUPS);
 
 export function VocabFilterSidebar({ filters, onFiltersChange, totalCount, filteredCount }: VocabFilterProps) {
   const [isMobile, setIsMobile] = useState(false);
@@ -156,7 +153,7 @@ export function VocabFilterSidebar({ filters, onFiltersChange, totalCount, filte
               className="cursor-pointer hover:bg-accent"
               onClick={() => toggleTag(tag)}
             >
-              {tag.replace(/_/g, " ")}
+              {tag}
             </Badge>
           ))}
         </div>
