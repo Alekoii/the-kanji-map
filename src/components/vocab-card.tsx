@@ -34,6 +34,14 @@ export function VocabCard({
   const [learntKanji] = useAtom(learntKanjiAtom);
   const kanjiBreakdown = getVocabKanjiBreakdown(expression);
 
+  const getKanjiTextColor = (score: number | undefined) => {
+    if (score === undefined) return "text-foreground";
+    if (score >= 20) return "text-green-500";
+    if (score >= 10) return "text-blue-500";
+    if (score > 0) return "text-yellow-500";
+    return "text-red-500";
+  };
+
   const getKanjiBorderColor = (score: number | undefined) => {
     if (score === undefined) return "border-border";
     if (score >= 20) return "border-green-500";
@@ -146,7 +154,7 @@ export function VocabCard({
             return (
               <span
                 key={index}
-                className={`text-lg font-bold px-1.5 py-0.5 rounded border-2 transition-colors ${getKanjiBackgroundColor(kanjiScore)} ${getKanjiBorderColor(kanjiScore)}`}
+                className={`text-lg font-bold transition-colors ${getKanjiTextColor(kanjiScore)}`}
               >
                 {item.kanji}
               </span>
