@@ -85,7 +85,7 @@ export function VocabCard({
                   Kanji
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+              <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto data-[state=open]:slide-in-from-top-4 data-[state=closed]:slide-out-to-top-4">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <span className="text-3xl">{expression}</span>
