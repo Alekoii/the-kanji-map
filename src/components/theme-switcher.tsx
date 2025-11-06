@@ -47,6 +47,9 @@ export const ThemeSwitcherButton = React.forwardRef<
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           Dark
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("warm")}>
+          Warm
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System
         </DropdownMenuItem>
