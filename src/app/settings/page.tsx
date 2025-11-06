@@ -52,14 +52,20 @@ const ENGLISH_FONTS = [
 ];
 
 const THEMES = [
+  { name: "Default", value: "default" },
+  { name: "Warm", value: "warm" },
+];
+
+const MODES = [
   { name: "Light", value: "light" },
   { name: "Dark", value: "dark" },
-  { name: "Warm", value: "warm" },
+  { name: "System", value: "system" },
 ];
 
 export default function SettingsPage() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [colorTheme, setColorTheme] = useState("default");
   const [mode, setMode] = useState<"light" | "dark" | "system">("system");
   const [japaneseFont, setJapaneseFont] = useState(JAPANESE_FONTS[0].value);
   const [englishFont, setEnglishFont] = useState(ENGLISH_FONTS[0].value);
@@ -68,10 +74,12 @@ export default function SettingsPage() {
     setMounted(true);
 
     // Load saved preferences
+    const savedColorTheme = localStorage.getItem("color-theme") || "default";
     const savedMode = localStorage.getItem("theme-mode") as "light" | "dark" | "system" | null;
     const savedJapaneseFont = localStorage.getItem("japanese-font");
     const savedEnglishFont = localStorage.getItem("english-font");
 
+    setColorTheme(savedColorTheme);
     if (savedMode) setMode(savedMode);
     if (savedJapaneseFont) setJapaneseFont(savedJapaneseFont);
     if (savedEnglishFont) setEnglishFont(savedEnglishFont);
@@ -87,20 +95,27 @@ export default function SettingsPage() {
     localStorage.setItem("english-font", englishFont);
   }, [japaneseFont, englishFont, mounted]);
 
-  const handleModeChange = (newMode: "light" | "dark" | "system") => {
-    setMode(newMode);
-    localStorage.setItem("theme-mode", newMode);
-
+  const applyTheme = (newMode: string, newColorTheme: string) => {
     if (newMode === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      setTheme(systemTheme);
+      const systemMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      const finalTheme = newColorTheme === "default" ? systemMode : newColorTheme;
+      setTheme(finalTheme);
     } else {
-      setTheme(newMode);
+      const finalTheme = newColorTheme === "default" ? newMode : newColorTheme;
+      setTheme(finalTheme);
     }
   };
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
+  const handleModeChange = (newMode: "light" | "dark" | "system") => {
+    setMode(newMode);
+    localStorage.setItem("theme-mode", newMode);
+    applyTheme(newMode, colorTheme);
+  };
+
+  const handleColorThemeChange = (newColorTheme: string) => {
+    setColorTheme(newColorTheme);
+    localStorage.setItem("color-theme", newColorTheme);
+    applyTheme(mode, newColorTheme);
   };
 
   if (!mounted) {
@@ -108,98 +123,96 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header route="settings" className="w-full" />
+    <div className="h-screen flex flex-col overflow-hidden">
+      <Header route="settings" className="w-full flex-shrink-0" />
 
-      <main className="flex-1 container max-w-4xl mx-auto px-4 py-8">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground mt-2">
-              Customize your learning experience
-            </p>
-          </div>
-
-          <Separator />
-
-          {/* Theme Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Theme</CardTitle>
-              <CardDescription>
-                Choose your preferred color theme
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {THEMES.map((themeOption) => (
-                  <button
-                    key={themeOption.value}
-                    onClick={() => handleThemeChange(themeOption.value)}
-                    className={`relative p-4 rounded-lg border-2 transition-all hover:border-primary ${
-                      theme === themeOption.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{themeOption.name}</span>
-                      {theme === themeOption.value && (
-                        <Check className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Mode Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance Mode</CardTitle>
-              <CardDescription>
-                Choose between light, dark, or system preference
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {["light", "dark", "system"].map((modeOption) => (
-                  <button
-                    key={modeOption}
-                    onClick={() => handleModeChange(modeOption as "light" | "dark" | "system")}
-                    className={`relative p-4 rounded-lg border-2 transition-all hover:border-primary ${
-                      mode === modeOption
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium capitalize">{modeOption}</span>
-                      {mode === modeOption && (
-                        <Check className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Current: <span className="font-medium">{resolvedTheme}</span>
+      <main className="flex-1 overflow-y-auto">
+        <div className="container max-w-3xl mx-auto px-4 py-4 pb-8">
+          <div className="space-y-3">
+            <div>
+              <h1 className="text-2xl font-bold">Settings</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Customize your learning experience
               </p>
-            </CardContent>
-          </Card>
+            </div>
+
+            <Separator />
+
+            {/* Mode Selection */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Mode</CardTitle>
+                <CardDescription className="text-sm">
+                  Choose between light, dark, or system preference
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-2">
+                  {MODES.map((modeOption) => (
+                    <button
+                      key={modeOption.value}
+                      onClick={() => handleModeChange(modeOption.value as "light" | "dark" | "system")}
+                      className={`relative p-3 rounded-lg border-2 transition-all hover:border-primary ${
+                        mode === modeOption.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="font-medium text-sm">{modeOption.name}</span>
+                        {mode === modeOption.value && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Color Theme Selection */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Color Theme</CardTitle>
+                <CardDescription className="text-sm">
+                  Choose your preferred color scheme
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-2">
+                  {THEMES.map((themeOption) => (
+                    <button
+                      key={themeOption.value}
+                      onClick={() => handleColorThemeChange(themeOption.value)}
+                      className={`relative p-3 rounded-lg border-2 transition-all hover:border-primary ${
+                        colorTheme === themeOption.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="font-medium text-sm">{themeOption.name}</span>
+                        {colorTheme === themeOption.value && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
           {/* Japanese Font */}
           <Card>
-            <CardHeader>
-              <CardTitle>Japanese Font</CardTitle>
-              <CardDescription>
-                Select a font for Japanese text (kanji, hiragana, katakana)
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Japanese Font</CardTitle>
+              <CardDescription className="text-sm">
+                Font for Japanese text (kanji, hiragana, katakana)
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <Select value={japaneseFont} onValueChange={setJapaneseFont}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
@@ -210,8 +223,8 @@ export default function SettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <div className="p-4 rounded-lg border bg-muted/50">
-                <p className="text-lg" style={{ fontFamily: japaneseFont }}>
+              <div className="p-3 rounded-lg border bg-muted/50">
+                <p className="text-base" style={{ fontFamily: japaneseFont }}>
                   漢字学習 - ひらがな - カタカナ
                 </p>
               </div>
@@ -220,15 +233,15 @@ export default function SettingsPage() {
 
           {/* English Font */}
           <Card>
-            <CardHeader>
-              <CardTitle>English Font</CardTitle>
-              <CardDescription>
-                Select a font for English text and interface
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">English Font</CardTitle>
+              <CardDescription className="text-sm">
+                Font for English text and interface
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2">
               <Select value={englishFont} onValueChange={setEnglishFont}>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
@@ -239,8 +252,8 @@ export default function SettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <div className="p-4 rounded-lg border bg-muted/50">
-                <p className="text-lg" style={{ fontFamily: englishFont }}>
+              <div className="p-3 rounded-lg border bg-muted/50">
+                <p className="text-base" style={{ fontFamily: englishFont }}>
                   The quick brown fox jumps over the lazy dog
                 </p>
               </div>
@@ -248,22 +261,26 @@ export default function SettingsPage() {
           </Card>
 
           {/* Reset Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => {
-                setTheme("light");
                 setMode("system");
+                setColorTheme("default");
                 setJapaneseFont(JAPANESE_FONTS[0].value);
                 setEnglishFont(ENGLISH_FONTS[0].value);
                 localStorage.removeItem("theme-mode");
+                localStorage.removeItem("color-theme");
                 localStorage.removeItem("japanese-font");
                 localStorage.removeItem("english-font");
+                applyTheme("system", "default");
               }}
             >
               Reset to Defaults
             </Button>
           </div>
+        </div>
         </div>
       </main>
     </div>
