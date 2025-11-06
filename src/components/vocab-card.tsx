@@ -1,10 +1,5 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2 } from "lucide-react";
-
 interface VocabCardProps {
   expression: string;
   reading: string;
@@ -22,58 +17,87 @@ export function VocabCard({
   tags,
   onClick,
   isSelected = false,
-  learningScore = 0,
+  learningScore,
 }: VocabCardProps) {
-  const getLearningColor = (score: number) => {
-    if (score >= 5) return "text-green-500";
-    if (score >= 3) return "text-yellow-500";
-    if (score >= 1) return "text-orange-500";
-    return "";
+  const getLearningBadgeColor = (score: number) => {
+    if (score >= 20) return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
+    if (score >= 10) return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+    if (score > 0) return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20";
+    return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
+  };
+
+  const getLearningLabel = (score: number) => {
+    if (score >= 20) return "Mastered";
+    if (score >= 10) return "Proficient";
+    if (score > 0) return "Learning";
+    return "Struggling";
+  };
+
+  const getProgressBarColor = (score: number) => {
+    if (score >= 20) return "bg-green-500";
+    if (score >= 10) return "bg-blue-500";
+    if (score > 0) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   // Get primary tag (JLPT level or source)
   const primaryTag = tags.find((tag) => tag.includes("JLPT")) || tags[0];
 
   return (
-    <Card
-      className={cn(
-        "cursor-pointer transition-all hover:shadow-md",
-        isSelected && "ring-2 ring-primary shadow-md",
-        "group relative"
-      )}
+    <div
       onClick={onClick}
+      className={`group relative border rounded-lg p-4 hover:shadow-lg transition-all duration-200 bg-card h-full flex flex-col cursor-pointer ${
+        isSelected
+          ? "border-primary bg-primary/5"
+          : "border-border hover:border-primary"
+      } ${learningScore !== undefined ? "pb-10" : ""}`}
     >
-      <CardContent className="p-3 space-y-1">
-        {/* Learning score indicator */}
-        {learningScore > 0 && (
-          <div className="absolute top-1.5 right-1.5">
-            <CheckCircle2 className={cn("h-4 w-4", getLearningColor(learningScore))} />
-          </div>
-        )}
-
-        {/* Expression */}
-        <div className="text-xl font-bold text-center">{expression}</div>
-
-        {/* Reading */}
-        <div className="text-xs text-muted-foreground text-center">{reading}</div>
-
-        {/* Meaning */}
-        <div className="text-xs text-center line-clamp-2 min-h-[2rem]">{meaning}</div>
-
-        {/* Tags */}
-        {primaryTag && (
-          <div className="flex justify-center pt-1">
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+      <div className="flex items-start justify-between mb-2">
+        <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
+          {expression}
+        </span>
+        <div className="flex flex-col gap-1 items-end">
+          {primaryTag && (
+            <span className="text-xs px-2 py-1 rounded-full bg-purple-500/10 text-purple-500">
               {primaryTag.replace(/_/g, " ")}
-            </Badge>
-          </div>
-        )}
+            </span>
+          )}
+        </div>
+      </div>
 
-        {/* Selection indicator */}
-        {isSelected && (
-          <div className="absolute inset-0 bg-primary/5 rounded-lg pointer-events-none" />
-        )}
-      </CardContent>
-    </Card>
+      <div className="mt-auto space-y-1 text-sm text-muted-foreground">
+        {/* Reading */}
+        <p className="text-xs font-medium text-foreground">
+          {reading}
+        </p>
+        {/* Meaning */}
+        <p className="line-clamp-2 text-xs">
+          {meaning}
+        </p>
+      </div>
+
+      {/* Learning Progress Indicator */}
+      {learningScore !== undefined && (
+        <div className="absolute bottom-0 left-0 right-0">
+          <div className="px-2 pb-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className={`text-[10px] font-medium ${getLearningBadgeColor(learningScore)}`}>
+                {getLearningLabel(learningScore)}
+              </span>
+              <span className={`text-[10px] font-bold ${getLearningBadgeColor(learningScore)}`}>
+                {learningScore > 0 ? '+' : ''}{learningScore}
+              </span>
+            </div>
+            {/* Progress bar */}
+            <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 ${getProgressBarColor(learningScore)}`}
+                style={{ width: `${Math.abs(learningScore) * 5}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
