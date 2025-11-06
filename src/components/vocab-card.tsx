@@ -11,6 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface VocabCardProps {
   expression: string;
@@ -65,7 +71,8 @@ export function VocabCard({
     return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
   };
 
-  const getLearningLabel = (score: number) => {
+  const getLearningLabel = (score: number | undefined) => {
+    if (score === undefined) return "Not practiced";
     if (score >= 20) return "Mastered";
     if (score >= 10) return "Proficient";
     if (score > 0) return "Learning";
@@ -148,19 +155,43 @@ export function VocabCard({
 
       {/* Kanji breakdown preview with color coding */}
       {kanjiBreakdown.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-2">
-          {kanjiBreakdown.map((item, index) => {
-            const kanjiScore = learntKanji[item.kanji];
-            return (
-              <span
-                key={index}
-                className={`text-lg font-bold transition-colors ${getKanjiTextColor(kanjiScore)}`}
-              >
-                {item.kanji}
-              </span>
-            );
-          })}
-        </div>
+        <TooltipProvider delayDuration={200}>
+          <div className="flex flex-wrap gap-1 mb-2">
+            {kanjiBreakdown.map((item, index) => {
+              const kanjiScore = learntKanji[item.kanji];
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger asChild>
+                    <span
+                      className={`text-lg font-bold transition-colors cursor-help ${getKanjiTextColor(kanjiScore)}`}
+                    >
+                      {item.kanji}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold">{item.kanji}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${getLearningBadgeColor(kanjiScore || 0)}`}>
+                          {getLearningLabel(kanjiScore)}
+                        </span>
+                      </div>
+                      {item.reading && (
+                        <p className="text-xs text-muted-foreground">{item.reading}</p>
+                      )}
+                      <p className="text-sm">{item.meaning}</p>
+                      {kanjiScore !== undefined && (
+                        <p className="text-xs text-muted-foreground">
+                          Score: {kanjiScore > 0 ? '+' : ''}{kanjiScore}
+                        </p>
+                      )}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </TooltipProvider>
       )}
 
       <div className="mt-auto space-y-1 text-sm text-muted-foreground">
