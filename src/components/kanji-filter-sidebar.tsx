@@ -8,12 +8,15 @@ import { X, SlidersHorizontal } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+export type KanjiProgressFilter = "all" | "not_practiced" | "struggling" | "learning" | "proficient" | "mastered";
+
 export interface KanjiFilters {
   search: string;
   searchType: "all" | "kanji" | "meaning" | "reading";
   type: "all" | "joyo" | "jinmeiyo" | "other";
   jlptLevels: string[];
   sortBy: "default" | "frequency" | "strokes";
+  progress: KanjiProgressFilter;
 }
 
 interface KanjiFilterProps {
@@ -84,6 +87,7 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
       type: "all" as const,
       jlptLevels: [],
       sortBy: "default" as const,
+      progress: "all" as const,
     };
     onFiltersChange(defaultFilters);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultFilters));
@@ -91,7 +95,8 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
 
   const hasActiveFilters = filters.type !== "all" ||
                           filters.jlptLevels.length > 0 ||
-                          filters.sortBy !== "default";
+                          filters.sortBy !== "default" ||
+                          filters.progress !== "all";
 
   const FilterContent = () => (
     <div className="space-y-3">
@@ -148,6 +153,24 @@ export function KanjiFilterSidebar({ filters, onFiltersChange, totalCount, filte
           <SelectItem value="joyo">Jōyō Kanji</SelectItem>
           <SelectItem value="jinmeiyo">Jinmeiyō Kanji</SelectItem>
           <SelectItem value="other">Other Kanji</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {/* Progress Filter */}
+      <Select
+        value={filters.progress}
+        onValueChange={(value) => updateFilter("progress", value as KanjiProgressFilter)}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Progress</SelectItem>
+          <SelectItem value="not_practiced">Not Practiced</SelectItem>
+          <SelectItem value="struggling">Struggling</SelectItem>
+          <SelectItem value="learning">Learning</SelectItem>
+          <SelectItem value="proficient">Proficient</SelectItem>
+          <SelectItem value="mastered">Mastered</SelectItem>
         </SelectContent>
       </Select>
 

@@ -35,6 +35,7 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
     type: "all",
     jlptLevels: [],
     sortBy: "default",
+    progress: "all",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
@@ -143,6 +144,29 @@ export function HomeContent({ isMobile = false }: HomeContentProps) {
       if (filters.jlptLevels.length > 0) {
         if (!item.j || !filters.jlptLevels.includes(item.j)) {
           return false;
+        }
+      }
+
+      // Progress filter
+      if (filters.progress !== "all") {
+        const score = learntKanji[item.k];
+
+        switch (filters.progress) {
+          case "not_practiced":
+            if (score !== undefined) return false;
+            break;
+          case "struggling":
+            if (score === undefined || score > 0) return false;
+            break;
+          case "learning":
+            if (score === undefined || score <= 0 || score >= 10) return false;
+            break;
+          case "proficient":
+            if (score === undefined || score < 10 || score >= 20) return false;
+            break;
+          case "mastered":
+            if (score === undefined || score < 20) return false;
+            break;
         }
       }
 
