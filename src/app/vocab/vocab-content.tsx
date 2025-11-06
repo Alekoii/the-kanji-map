@@ -43,6 +43,7 @@ export function VocabContent({ isMobile = false }: VocabContentProps) {
     searchType: "all",
     tags: [],
     sortBy: "default",
+    progress: "all",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [practiceVocab, setPracticeVocab] = useAtom(practiceVocabAtom);
@@ -130,6 +131,29 @@ export function VocabContent({ isMobile = false }: VocabContentProps) {
         const hasMatchingTag = expandedTags.some((tag) => item.tags.includes(tag));
         if (!hasMatchingTag) {
           return false;
+        }
+      }
+
+      // Progress filter
+      if (filters.progress !== "all") {
+        const score = learntVocab[item.expression];
+
+        switch (filters.progress) {
+          case "not_practiced":
+            if (score !== undefined) return false;
+            break;
+          case "struggling":
+            if (score === undefined || score > 0) return false;
+            break;
+          case "learning":
+            if (score === undefined || score <= 0 || score >= 10) return false;
+            break;
+          case "proficient":
+            if (score === undefined || score < 10 || score >= 20) return false;
+            break;
+          case "mastered":
+            if (score === undefined || score < 20) return false;
+            break;
         }
       }
 

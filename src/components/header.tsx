@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const navItems = [
+  { href: "/", label: "Kanji", route: "home" },
   { href: "/vocab", label: "Vocabulary", route: "vocab" },
   { href: "/practice", label: "Practice", route: "practice" },
   { href: "/learnt", label: "Progress", route: "learnt" },

@@ -9,11 +9,14 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
+export type ProgressFilter = "all" | "not_practiced" | "struggling" | "learning" | "proficient" | "mastered";
+
 export interface VocabFilters {
   search: string;
   searchType: "all" | "expression" | "meaning" | "reading";
   tags: string[];
   sortBy: "default" | "alphabetical";
+  progress: ProgressFilter;
 }
 
 interface VocabFilterProps {
@@ -95,12 +98,13 @@ export function VocabFilterSidebar({ filters, onFiltersChange, totalCount, filte
       searchType: "all" as const,
       tags: [],
       sortBy: "default" as const,
+      progress: "all" as const,
     };
     onFiltersChange(defaultFilters);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultFilters));
   };
 
-  const hasActiveFilters = filters.tags.length > 0 || filters.sortBy !== "default";
+  const hasActiveFilters = filters.tags.length > 0 || filters.sortBy !== "default" || filters.progress !== "all";
 
   const FilterContent = () => (
     <div className="space-y-3">
@@ -157,6 +161,27 @@ export function VocabFilterSidebar({ filters, onFiltersChange, totalCount, filte
             </Badge>
           ))}
         </div>
+      </div>
+
+      {/* Progress Filter */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Progress</label>
+        <Select
+          value={filters.progress}
+          onValueChange={(value) => updateFilter("progress", value as ProgressFilter)}
+        >
+          <SelectTrigger className="h-9">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Progress</SelectItem>
+            <SelectItem value="not_practiced">Not Practiced</SelectItem>
+            <SelectItem value="struggling">Struggling</SelectItem>
+            <SelectItem value="learning">Learning</SelectItem>
+            <SelectItem value="proficient">Proficient</SelectItem>
+            <SelectItem value="mastered">Mastered</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Sort By */}

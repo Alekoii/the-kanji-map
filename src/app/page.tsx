@@ -4,7 +4,7 @@ import { HomeContent } from "./home-content";
 export default function Home() {
   return (
     <div className="size-full flex flex-col">
-      <Header className="w-full" />
+      <Header route="home" className="w-full" />
       {/* MOBILE */}
       <div className="w-full h-[calc(100%-3rem)] md:hidden">
         <HomeContent isMobile={true} />
