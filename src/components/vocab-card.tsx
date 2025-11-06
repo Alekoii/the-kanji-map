@@ -99,7 +99,7 @@ export function VocabCard({
       } ${learningScore !== undefined ? "pb-10" : ""}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
+        <span lang="ja" className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
           {expression}
         </span>
         <div className="flex flex-col gap-1 items-end">
@@ -122,7 +122,7 @@ export function VocabCard({
               <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto data-[state=open]:slide-in-from-top-4 data-[state=closed]:slide-out-to-top-4">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
-                    <span className="text-3xl">{expression}</span>
+                    <span lang="ja" className="text-3xl">{expression}</span>
                     <span className="text-sm font-normal text-muted-foreground">- Kanji Breakdown</span>
                   </DialogTitle>
                 </DialogHeader>
@@ -134,10 +134,10 @@ export function VocabCard({
                         key={index}
                         className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-colors ${getKanjiBackgroundColor(kanjiScore)} ${getKanjiBorderColor(kanjiScore)}`}
                       >
-                        <span className="text-4xl font-bold shrink-0">{item.kanji}</span>
+                        <span lang="ja" className="text-4xl font-bold shrink-0">{item.kanji}</span>
                         <div className="flex-1 min-w-0 space-y-1">
                           {item.reading && (
-                            <p className="text-sm text-muted-foreground">
+                            <p lang="ja" className="text-sm text-muted-foreground">
                               {item.reading}
                             </p>
                           )}
@@ -163,6 +163,7 @@ export function VocabCard({
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
                     <span
+                      lang="ja"
                       className={`text-lg font-bold transition-colors cursor-help ${getKanjiTextColor(kanjiScore)}`}
                     >
                       {item.kanji}
@@ -171,13 +172,13 @@ export function VocabCard({
                   <TooltipContent className="max-w-xs">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold">{item.kanji}</span>
+                        <span lang="ja" className="text-2xl font-bold">{item.kanji}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${getLearningBadgeColor(kanjiScore || 0)}`}>
                           {getLearningLabel(kanjiScore)}
                         </span>
                       </div>
                       {item.reading && (
-                        <p className="text-xs text-muted-foreground">{item.reading}</p>
+                        <p lang="ja" className="text-xs text-muted-foreground">{item.reading}</p>
                       )}
                       <p className="text-sm">{item.meaning}</p>
                       {kanjiScore !== undefined && (
@@ -196,7 +197,7 @@ export function VocabCard({
 
       <div className="mt-auto space-y-1 text-sm text-muted-foreground">
         {/* Reading */}
-        <p className="text-xs font-medium text-foreground">
+        <p lang="ja" className="text-xs font-medium text-foreground">
           {reading}
         </p>
         {/* Meaning */}

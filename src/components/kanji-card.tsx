@@ -67,7 +67,7 @@ export function KanjiCard({
       } ${learningScore !== undefined ? "pb-10" : ""}`}
     >
       <div className="flex items-start justify-between mb-2">
-        <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
+        <span lang="ja" className="text-4xl font-bold group-hover:scale-110 transition-transform duration-200">
           {kanji}
         </span>
         <div className="flex flex-col gap-1 items-end">
@@ -95,7 +95,7 @@ export function KanjiCard({
             </p>
           )}
           {kunyomi && (
-            <p className="line-clamp-1 text-xs">
+            <p lang="ja" className="line-clamp-1 text-xs">
               訓: {kunyomi}
             </p>
           )}
